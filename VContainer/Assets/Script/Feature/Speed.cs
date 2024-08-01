@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Speed : ISpeed
 {
-    public float _speed = 0.05f;
+    public float _speed;
 
     public float GetSpeed()
     {

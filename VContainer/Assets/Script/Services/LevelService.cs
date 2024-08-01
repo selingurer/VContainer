@@ -1,7 +1,7 @@
 
 using UnityEngine;
 
-public class LevelService : ILevelService
+public class LevelService : ILevelService 
 {
     private int _level;
     public void SetLevel(int level)

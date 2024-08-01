@@ -1,24 +1,32 @@
 using DG.Tweening;
+using System;
 using UnityEngine;
 using VContainer;
+using VContainer.Diagnostics;
 
 
 public class Player : MonoBehaviour
 {
-    public Speed _speed;
     [SerializeField] private FixedJoystick _joystick;
+    public ISpeed _speed;
+    public IHealt _healt;
+    public IAttack _attack;
     private Rigidbody2D _rigidbody;
     float _horizontal;
     float _vertical;
 
+ 
     [Inject]
-    private void Construct(Speed speed)
+    private void Construct(ISpeed speed, IHealt healt,IAttack attack)
     {
         _speed = speed;
+        _healt = healt;
+        _attack = attack;
     }
 
     void Start()
     {
+        _speed.SetSpeed(0.05f);
         _rigidbody = GetComponent<Rigidbody2D>();
     }
 
@@ -36,4 +44,5 @@ public class Player : MonoBehaviour
         _horizontal = _joystick.Horizontal;
         _vertical = _joystick.Vertical;
     }
+
 }
