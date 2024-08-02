@@ -1,3 +1,4 @@
+using Assets.Script.Services;
 using System.Collections.Generic;
 using UnityEngine;
 using VContainer;
@@ -5,20 +6,17 @@ using VContainer.Unity;
 
 public class ObjectPool<T> where T : Component
 {
-    private readonly Queue<T> _objects = new Queue<T>();
-    private readonly T _prefab;
-    private readonly IObjectResolver _resolver;
-    private readonly Transform _parent;
+    public readonly Queue<T> _objects = new Queue<T>();
+    private T _prefab;
+    private IObjectResolver _resolver;
+    private Transform _parent;
 
-    // Object Pool'u oluþtururken prefab ve resolver alýyoruz.
-    public ObjectPool(T prefab, int initialSize, IObjectResolver resolver, Transform parent)
+    public ObjectPool(T prefab, int size, IObjectResolver resolver)
     {
         _prefab = prefab;
+        //_parent = transform;
         _resolver = resolver;
-        _parent = parent;
-
-        // Baþlangýçta belirli sayýda nesne oluþturarak havuza ekliyoruz.
-        for (int i = 0; i < initialSize; i++)
+        for (int i = 0; i < size; i++)
         {
             AddObjectToPool();
         }
@@ -46,9 +44,11 @@ public class ObjectPool<T> where T : Component
     }
 
     // Havuz büyütülmesi gerektiðinde yeni bir nesne ekliyoruz.
-    private void AddObjectToPool()
+    private T AddObjectToPool()
     {
         var newObject = _resolver.Instantiate(_prefab, _parent);
+        newObject.gameObject.SetActive(false);
         _objects.Enqueue(newObject);
+        return newObject;
     }
 }

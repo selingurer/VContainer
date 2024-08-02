@@ -1,9 +1,10 @@
 
 using UnityEngine;
 
-public class LevelService : ILevelService 
+public class LevelService : ILevelService
 {
     private int _level;
+    private int initialEnemyPoolSize = 15;
     public void SetLevel(int level)
     {
         if (_level > level)
@@ -21,6 +22,11 @@ public class LevelService : ILevelService
 
     public void LevelIncrease()
     {
+        initialEnemyPoolSize += initialEnemyPoolSize / 10;
+    }
 
+    public int GetInitialPoolSize()
+    {
+       return initialEnemyPoolSize;
     }
 }

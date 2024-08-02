@@ -10,11 +10,8 @@ public enum EnemyType
     Speed = 2,
 }
 
-public class Enemy : MonoBehaviour
+public class Enemy : BaseCharacter
 {
-    public ISpeed _speed;
-    public IHealt _healt;
-    public IAttack _attack;
     private Rigidbody2D _rigidbody;
     private Player _player;
     private EnemyType _enemyType
@@ -26,26 +23,26 @@ public class Enemy : MonoBehaviour
                 case EnemyType.Attack:
                     _attack.SetAttack(20);
                     _healt.SetHealt(100);
-                    this._speed.SetSpeed(0.4f);
+                    this._speed.SetSpeed(3f);
                     gameObject.GetComponent<SpriteRenderer>().color = Color.blue;
                     break;
                 case EnemyType.Heart:
                     _healt.SetHealt(110);
                     _attack.SetAttack(10);
-                    this._speed.SetSpeed(0.4f);
+                    this._speed.SetSpeed(3f);
                     gameObject.GetComponent<SpriteRenderer>().color = Color.red;
                     break;
                 case EnemyType.Speed:
                     _healt.SetHealt(100);
                     _attack.SetAttack(10);
-                    this._speed.SetSpeed(0.5f);
+                    this._speed.SetSpeed(4f);
                     gameObject.GetComponent<SpriteRenderer>().color = Color.green;
                     break;
             }
         }
     }
     [Inject]
-    private void Construct(ISpeed speed, IHealt healt, IAttack attack,Player player)
+    private void Construct(ISpeed speed, IHealt healt, IAttack attack, Player player)
     {
         _speed = speed;
         _healt = healt;
@@ -55,16 +52,35 @@ public class Enemy : MonoBehaviour
     private void Awake()
     {
         _rigidbody = GetComponent<Rigidbody2D>();
-    }
-    private void Start()
-    {
         int rnd = Random.Range(0, 3);
         _enemyType = (EnemyType)rnd;
     }
-    private void Update()
+    private void FixedUpdate()
     {
-        _rigidbody.DOMove((Vector2)_player.transform.position, _speed.GetSpeed());
+        MoveTowardsPlayer();
         Debug.Log(_speed.GetSpeed());
     }
+    private void MoveTowardsPlayer()
+    {
+        // Oyuncu ile düþman arasýndaki yön vektörünü hesapla
+        Vector2 direction = (_player.transform.position - transform.position).normalized;
 
+        // Hýz vektörünü hesapla
+        Vector2 velocity = direction * _speed.GetSpeed();
+
+        // Rigidbody2D'nin hýzýný ayarla
+        _rigidbody.velocity = velocity;
+
+        // Düþmanýn bakýþ yönünü ayarla
+        SetLookDirection(direction);
+    }
+    private void SetLookDirection(Vector2 direction)
+    {
+        // Düþmanýn yönünü oyuncuya çevir
+        if (direction != Vector2.zero)
+        {
+            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+            _rigidbody.rotation = angle;
+        }
+    }
 }
