@@ -1,7 +1,7 @@
 
+using Cysharp.Threading.Tasks;
 using System;
 using UnityEngine;
-using VContainer;
 using VContainer.Unity;
 
 public class ExperienceService : IStartable
@@ -10,11 +10,12 @@ public class ExperienceService : IStartable
     public ObjectPool<Experience> _experiencePool;
     public GameService _gameService;
 
- 
+
     public void GetExperience(Vector3 pos)
     {
         var obj = _experiencePool.Get();
         obj.transform.position = pos;
+        _ = DestroyExperience(obj);
     }
     public void SetExperienceValue(int value)
     {
@@ -26,7 +27,11 @@ public class ExperienceService : IStartable
     {
         _experiencePool.ReturnToPool(experience);
     }
-
+    private async UniTaskVoid DestroyExperience(Experience experience)
+    {
+        await UniTask.Delay(TimeSpan.FromSeconds(5), ignoreTimeScale: true);
+        ReturnToExperiencePool(experience);
+    }
     public void Start()
     {
         throw new NotImplementedException();

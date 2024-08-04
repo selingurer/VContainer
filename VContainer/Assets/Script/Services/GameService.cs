@@ -15,7 +15,7 @@ public class GameService : IStartable
     private ExperienceService _experienceService;
 
     [Inject]
-    private void Construct(ILevelService service, IObjectResolver resolver, Player player, ObjectPool<Enemy> enemyPool,ObjectPool<Experience> expool, EnemyService enemyService,ExperienceService experienceService, GameUIService gameUIService)
+    private void Construct(ILevelService service, IObjectResolver resolver, Player player, ObjectPool<Enemy> enemyPool, ObjectPool<Experience> expool, EnemyService enemyService, ExperienceService experienceService, GameUIService gameUIService)
     {
         _levelService = service;
         _player = player;
@@ -34,6 +34,7 @@ public class GameService : IStartable
         _experienceService._experiencePool = _experiencePool;
         _enemyService._experienceService = _experienceService;
         _experienceService._gameService = this;
+        _player._gameService = this;
     }
 
     public void CreateEnemy()
@@ -58,13 +59,25 @@ public class GameService : IStartable
     {
         int playerExperienceValue = _player.GetExperienceValue();
         _player.SetExperienceValue(playerExperienceValue += exValue);
-        _gameUIService.ExperienceValueChanged(_player.GetExperienceValue(),_levelService.GetExperienceTargetValue());
+        _gameUIService.ExperienceValueChanged(_player.GetExperienceValue(), _levelService.GetExperienceTargetValue());
         if (_player.GetExperienceValue() >= _levelService.GetExperienceTargetValue())
         {
+            _player.SetExperienceValue(0);
             _levelService.SetLevel(_levelService.GetLevel() + 1);
+            _gameUIService.ExperienceValueChanged(0, _levelService.GetExperienceTargetValue());
+            _ = _gameUIService.LevelChanged(_levelService.GetLevel());
+            CreateEnemy();
         }
 
     }
-
+    public void GameOver()
+    {
+        GameOverData data = new GameOverData()
+        {
+            totalExperience = _player.GetTotalExperienceValue(),
+            level = _levelService.GetLevel(),
+        };
+         _gameUIService.GameOver(data);
+    }
 }
 

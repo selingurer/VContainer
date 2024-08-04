@@ -15,6 +15,8 @@ public class Player : BaseCharacter
     private bool _canDamage = true;
     private readonly int _cooldownTime = 1000;
     private int _experienceValue;
+    private int _totalExperienceValue;
+    public GameService _gameService;
 
     [Inject]
     private void Construct(ISpeed speed, IHealt healt, IAttack attack, ObjectPool<Bullet> bulletPool, EnemyService enemyService)
@@ -30,9 +32,13 @@ public class Player : BaseCharacter
         _speed.SetSpeed(5f);
         _rigidbody = GetComponent<Rigidbody2D>();
         _attack.SetAttack(100);
-        _healt.SetHealt(500, this);
+        _healt.SetHealt(200, this);
+        _healt.OnHealthChanged += (healt, chara) => { OnHealtChanged(healt, chara); };
     }
-
+    private void OnDestroy()
+    {
+        _healt.OnHealthChanged -= (healt, chara) => { OnHealtChanged(healt, chara); };
+    }
     void FixedUpdate()
     {
         GetMovementInput();
@@ -41,15 +47,20 @@ public class Player : BaseCharacter
     }
     private void SetMovement()
     {
-        _rigidbody.velocity = new Vector2( _horizontal, _vertical) * _speed.GetSpeed();
+        _rigidbody.velocity = new Vector2(_horizontal, _vertical) * _speed.GetSpeed();
     }
     public void SetExperienceValue(int exValue)
     {
         _experienceValue = exValue;
+        _totalExperienceValue = exValue == 0 ? _totalExperienceValue : _totalExperienceValue += exValue;
     }
     public int GetExperienceValue()
     {
         return _experienceValue;
+    }
+    public int GetTotalExperienceValue()
+    {
+        return _totalExperienceValue;
     }
     private void GetMovementInput()
     {
@@ -74,5 +85,24 @@ public class Player : BaseCharacter
 
             _canDamage = true; // Cooldown bitti, tekrar ateþ edilebilir
         }
+    }
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.GetComponent<Enemy>() != null)
+        {
+            float attack = collision.gameObject.GetComponent<Enemy>()._attack.GetAttack();
+            _healt.SetHealt(_healt.GetHealt() - attack, this);
+        }
+    }
+    private void OnHealtChanged(float newHealt, BaseCharacter character)
+    {
+        if (character == this)
+        {
+            if (newHealt <= 0)
+            {
+                _gameService.GameOver();
+            }
+        }
+
     }
 }

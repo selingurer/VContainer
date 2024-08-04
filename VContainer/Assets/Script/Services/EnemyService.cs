@@ -20,7 +20,7 @@ namespace Assets.Script.Services
             foreach (Enemy enemy in _ActiveEnemyList)
             {
 
-                if (Vector3.Distance(enemy.transform.position, origin) < 4)
+                if (Vector3.Distance(enemy.transform.position, origin) < 5 && Vector3.Distance(enemy.transform.position, origin) > 2)
                 {
                     return enemy;
                 }

@@ -14,7 +14,6 @@ public class LevelService : ILevelService
             LevelIncrease();
         }
         _level = level;
-        Debug.Log(_level);
     }
 
     public int GetLevel()
