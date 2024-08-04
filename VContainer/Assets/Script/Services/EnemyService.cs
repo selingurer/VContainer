@@ -7,10 +7,13 @@ using VContainer.Unity;
 
 namespace Assets.Script.Services
 {
-    public class EnemyService
+    public class EnemyService : IStartable
     {
+        public ExperienceService _experienceService;
         public List<Enemy> _ActiveEnemyList = new List<Enemy>();
+        public ObjectPool<Enemy> _enemyPool;
 
+       
         public Enemy GetClosestEnemy(Vector3 origin)
         {
 
@@ -23,6 +26,18 @@ namespace Assets.Script.Services
                 }
             }
             return null;
+        }
+
+        public void EnemyReturnToPool(Enemy enemy)
+        {
+            _experienceService.GetExperience(enemy.transform.position);
+            _enemyPool.ReturnToPool(enemy);
+            _ActiveEnemyList.Remove(enemy);
+        }
+
+        public void Start()
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

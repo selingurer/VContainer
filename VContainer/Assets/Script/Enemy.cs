@@ -1,6 +1,5 @@
 
-using DG.Tweening;
-using Unity.VisualScripting;
+using Assets.Script.Services;
 using UnityEngine;
 using VContainer;
 public enum EnemyType
@@ -14,6 +13,7 @@ public class Enemy : BaseCharacter
 {
     private Rigidbody2D _rigidbody;
     private Player _player;
+    private EnemyService _enemyService;
     private EnemyType _enemyType
     {
         set
@@ -22,18 +22,18 @@ public class Enemy : BaseCharacter
             {
                 case EnemyType.Attack:
                     _attack.SetAttack(20);
-                    _healt.SetHealt(100);
+                    _healt.SetHealt(100, this);
                     this._speed.SetSpeed(3f);
                     gameObject.GetComponent<SpriteRenderer>().color = Color.blue;
                     break;
                 case EnemyType.Heart:
-                    _healt.SetHealt(110);
+                    _healt.SetHealt(110, this);
                     _attack.SetAttack(10);
                     this._speed.SetSpeed(3f);
                     gameObject.GetComponent<SpriteRenderer>().color = Color.red;
                     break;
                 case EnemyType.Speed:
-                    _healt.SetHealt(100);
+                    _healt.SetHealt(100, this);
                     _attack.SetAttack(10);
                     this._speed.SetSpeed(4f);
                     gameObject.GetComponent<SpriteRenderer>().color = Color.green;
@@ -42,23 +42,40 @@ public class Enemy : BaseCharacter
         }
     }
     [Inject]
-    private void Construct(ISpeed speed, IHealt healt, IAttack attack, Player player)
+    private void Construct(ISpeed speed, IHealt healt, IAttack attack, Player player, EnemyService service)
     {
         _speed = speed;
         _healt = healt;
         _attack = attack;
         _player = player;
+        _enemyService = service;
     }
     private void Awake()
     {
         _rigidbody = GetComponent<Rigidbody2D>();
         int rnd = Random.Range(0, 3);
         _enemyType = (EnemyType)rnd;
+        _healt.OnHealthChanged += (healt, chara) => { OnHealtChanged(healt, chara); };
+    }
+
+    private void OnHealtChanged(float newHealt, BaseCharacter character)
+    {
+        if (character == this)
+        {
+            if (newHealt <= 0)
+            {
+                _enemyService.EnemyReturnToPool(this);
+            }
+        }
+
+    }
+    private void OnDisable()
+    {
+        _healt.OnHealthChanged -= (healt, chara) => { OnHealtChanged(healt, chara); };
     }
     private void FixedUpdate()
     {
         MoveTowardsPlayer();
-        Debug.Log(_speed.GetSpeed());
     }
     private void MoveTowardsPlayer()
     {

@@ -1,7 +1,6 @@
 
 using Assets.Script.Services;
 using Cysharp.Threading.Tasks;
-using DG.Tweening;
 using UnityEngine;
 using VContainer;
 
@@ -15,6 +14,7 @@ public class Player : BaseCharacter
     private EnemyService _enemyService;
     private bool _canDamage = true;
     private readonly int _cooldownTime = 1000;
+    private int _experienceValue;
 
     [Inject]
     private void Construct(ISpeed speed, IHealt healt, IAttack attack, ObjectPool<Bullet> bulletPool, EnemyService enemyService)
@@ -29,6 +29,8 @@ public class Player : BaseCharacter
     {
         _speed.SetSpeed(5f);
         _rigidbody = GetComponent<Rigidbody2D>();
+        _attack.SetAttack(100);
+        _healt.SetHealt(500, this);
     }
 
     void FixedUpdate()
@@ -40,6 +42,14 @@ public class Player : BaseCharacter
     private void SetMovement()
     {
         _rigidbody.velocity = new Vector2( _horizontal, _vertical) * _speed.GetSpeed();
+    }
+    public void SetExperienceValue(int exValue)
+    {
+        _experienceValue = exValue;
+    }
+    public int GetExperienceValue()
+    {
+        return _experienceValue;
     }
     private void GetMovementInput()
     {
@@ -57,6 +67,8 @@ public class Player : BaseCharacter
             var obj = _bulletPool.Get();
             obj.transform.position = transform.position;
             obj.Target(enemy);
+            obj.SetAttack(_attack);
+            obj.SetObjectPool(_bulletPool);
 
             await UniTask.Delay(_cooldownTime); // Cooldown süresi kadar bekle
 

@@ -9,24 +9,30 @@ public class Bullet : MonoBehaviour
 {
     private IAttack _attactValue;
     private BaseCharacter _targetObj;
-    [Inject]
-    private void Construct(IAttack attack)
+    private ObjectPool<Bullet> _bulletPool;
+    public void SetAttack(IAttack attack)
     {
+        Debug.LogWarning(attack.GetAttack());
         _attactValue = attack;
     }
-    public Bullet(IAttack attack)
-    {  _attactValue = attack;}
     public void Target(BaseCharacter target)
     {
+        _targetObj = target;
         transform.DOMove(target.transform.position, 0.5f).SetEase(Ease.Linear);
     }
-   
-    private void OnTriggerEnter(Collider collider)
+    public void SetObjectPool(ObjectPool<Bullet> pool)
     {
-        if (collider.gameObject == _targetObj)
+        _bulletPool = pool;
+    }
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.tag == _targetObj.tag)
         {
-            float Healt = _targetObj._healt.GetHealt() - _attactValue.GetAttack();
-            _targetObj._healt.SetHealt(Healt);
+            float Healt = collision.gameObject.GetComponent<Enemy>()._healt.GetHealt() - _attactValue.GetAttack();
+            collision.gameObject.GetComponent<Enemy>()._healt.SetHealt(Healt, collision.gameObject.GetComponent<Enemy>());
+            _bulletPool.ReturnToPool(this);
         }
     }
+
+  
 }
