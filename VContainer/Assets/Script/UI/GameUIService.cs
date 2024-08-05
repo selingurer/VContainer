@@ -10,14 +10,12 @@ public struct GameOverObj
 {
     public Text txtLevel;
     public Text txtTotalExperience;
-    public Text txtGameTime;
     public CanvasGroup objGameOverPanel;
 }
 public class GameOverData
 {
     public int level;
     public int totalExperience;
-    public DateTime totalGameTime;
 }
 
 public class GameUIService : MonoBehaviour
@@ -62,7 +60,6 @@ public class GameUIService : MonoBehaviour
         _gameOverObj.objGameOverPanel.interactable = true;
         _gameOverObj.objGameOverPanel.DOFade(1, 0.5f).SetUpdate(true);
         _gameOverObj.txtLevel.text = data.level.ToString();
-      //  _gameOverObj.txtGameTime.text = _gameOverData.totalGameTime.ToString();
         _gameOverObj.txtTotalExperience.text = data.totalExperience.ToString();
     }
     
