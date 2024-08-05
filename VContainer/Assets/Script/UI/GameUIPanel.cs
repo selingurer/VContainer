@@ -1,3 +1,4 @@
+using Assets.Script.Feature.Rewards;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using System;
@@ -27,9 +28,14 @@ public class GameUIPanel : MonoBehaviour
     [SerializeField] private Text txtLevel;
     [SerializeField] private Button btnContinue;
     [SerializeField] private Slider sliderHeart;
-
-    [Inject]
+    [SerializeField] private Transform contentRewards;
+    [SerializeField] Rewards rewards;
     private SceneService _sceneService;
+    [Inject]
+    private void Construct(SceneService sceneService)
+    {
+        _sceneService = sceneService;   
+    }
     private void Awake()
     {
         btnContinue.onClick.AddListener(BtnContinueClicked);
@@ -70,5 +76,8 @@ public class GameUIPanel : MonoBehaviour
         _gameOverObj.txtLevel.text = data.level.ToString();
         _gameOverObj.txtTotalExperience.text = data.totalExperience.ToString();
     }
-
+    public void CreateRewards()
+    {
+        var reward = Instantiate(rewards, contentRewards);
+    }
 }

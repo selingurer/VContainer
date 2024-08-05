@@ -24,7 +24,7 @@ public class LevelService : ILevelService
     public void LevelIncrease()
     {
         initialEnemyPoolSize += initialEnemyPoolSize / 10;
-        _experienceTargetValue += _experienceTargetValue * 2;
+        _experienceTargetValue += (int)(_experienceTargetValue * 1.5f);
     }
 
     public int GetInitialPoolSize()

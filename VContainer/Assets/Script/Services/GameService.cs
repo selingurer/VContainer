@@ -30,8 +30,8 @@ public class GameService : IStartable
     void IStartable.Start()
     {
         _levelService.SetLevel(1);
-        CreateEnemy();
         _enemyService._enemyPool = _enemyPool;
+        _enemyService.CreateEnemy();
         _experienceService._experiencePool = _experiencePool;
         _enemyService._experienceService = _experienceService;
         _experienceService._gameService = this;
@@ -40,24 +40,7 @@ public class GameService : IStartable
         _gameUIService.SliderHeartValueChanged((int)playerHeartValue, (int)playerHeartValue);
     }
 
-    public void CreateEnemy()
-    {
-        List<Vector2> vectorList = new List<Vector2>();
-        for (int i = 0; i < _levelService.GetInitialPoolSize(); i++)
-        {
-            int x = Random.Range(-40, 40);
-            int xV = x == _player.transform.position.x ? 30 : x;
-            int y = Random.Range(-40, 40);
-            int yV = y == _player.transform.position.y ? 30 : y;
-            vectorList.Add(new Vector2(_player.transform.position.x + xV, _player.transform.position.y + yV));
-        }
-        for (int i = 0; i < _levelService.GetInitialPoolSize(); i++)
-        {
-            var obj = _enemyPool.Get();
-            obj.gameObject.transform.position = vectorList[i];
-            _enemyService._ActiveEnemyList.Add(obj);
-        }
-    }
+    
     public async void ExperienceValueChanged(int exValue)
     {
         int playerExperienceValue = _player.GetExperienceValue();
@@ -69,7 +52,7 @@ public class GameService : IStartable
             _levelService.SetLevel(_levelService.GetLevel() + 1);
             await _gameUIService.ExperienceValueChanged(0, _levelService.GetExperienceTargetValue());
             _ = _gameUIService.LevelChanged(_levelService.GetLevel());
-            CreateEnemy();
+            _enemyService.CreateEnemy();
         }
     }
     public void GameOver()

@@ -21,16 +21,17 @@ public class GameSceneLifetimeScope : LifetimeScope
         builder.Register<Attack>(Lifetime.Transient).AsImplementedInterfaces();
         builder.RegisterInstance(objBullet);
         builder.RegisterInstance(gameUIPanel);
+        builder.RegisterInstance(objPlayer).WithParameter(objBullet);
+        builder.Register<Enemy>(Lifetime.Transient).WithParameter(objPlayer); 
 
         builder.Register<ObjectPool<Enemy>>(Lifetime.Singleton).WithParameter(objEnemyPrefab).WithParameter(20);
         builder.Register<ObjectPool<Bullet>>(Lifetime.Singleton).WithParameter(objBullet).WithParameter(20);
         builder.Register<ObjectPool<Experience>>(Lifetime.Singleton).WithParameter(objExperience).WithParameter(20);
 
-        builder.RegisterInstance(objPlayer).WithParameter(objBullet);
-        builder.Register<Enemy>(Lifetime.Transient).WithParameter(objPlayer); 
         builder.Register<ExperienceService>(Lifetime.Singleton).AsSelf();
         builder.Register<EnemyService>(Lifetime.Singleton).AsSelf();
         builder.Register<Experience>(Lifetime.Transient);
+        builder.Register<PerkService>(Lifetime.Singleton).AsImplementedInterfaces();
         builder.Register<GameService>(Lifetime.Singleton).AsImplementedInterfaces()
             .WithParameter(objEnemyPrefab)
             .WithParameter(transformEnemy)
