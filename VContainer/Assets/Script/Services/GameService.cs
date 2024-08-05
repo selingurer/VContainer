@@ -1,4 +1,5 @@
 ﻿using Assets.Script.Services;
+using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
 using UnityEngine;
 using VContainer;
@@ -11,11 +12,11 @@ public class GameService : IStartable
     private ObjectPool<Experience> _experiencePool;
     private Player _player;
     private EnemyService _enemyService;
-    private GameUIService _gameUIService;
+    private GameUIPanel _gameUIService;
     private ExperienceService _experienceService;
 
     [Inject]
-    private void Construct(ILevelService service, IObjectResolver resolver, Player player, ObjectPool<Enemy> enemyPool, ObjectPool<Experience> expool, EnemyService enemyService, ExperienceService experienceService, GameUIService gameUIService)
+    private void Construct(ILevelService service, IObjectResolver resolver, Player player, ObjectPool<Enemy> enemyPool, ObjectPool<Experience> expool, EnemyService enemyService, ExperienceService experienceService, GameUIPanel gameUIService)
     {
         _levelService = service;
         _player = player;
@@ -35,6 +36,8 @@ public class GameService : IStartable
         _enemyService._experienceService = _experienceService;
         _experienceService._gameService = this;
         _player._gameService = this;
+        float playerHeartValue = _player._healt.GetHealt();
+        _gameUIService.SliderHeartValueChanged((int)playerHeartValue, (int)playerHeartValue);
     }
 
     public void CreateEnemy()
@@ -55,20 +58,19 @@ public class GameService : IStartable
             _enemyService._ActiveEnemyList.Add(obj);
         }
     }
-    public void ExperienceValueChanged(int exValue)
+    public async void ExperienceValueChanged(int exValue)
     {
         int playerExperienceValue = _player.GetExperienceValue();
         _player.SetExperienceValue(playerExperienceValue += exValue);
-        _gameUIService.ExperienceValueChanged(_player.GetExperienceValue(), _levelService.GetExperienceTargetValue());
+        _ = _gameUIService.ExperienceValueChanged(_player.GetExperienceValue(), _levelService.GetExperienceTargetValue());
         if (_player.GetExperienceValue() >= _levelService.GetExperienceTargetValue())
         {
             _player.SetExperienceValue(0);
             _levelService.SetLevel(_levelService.GetLevel() + 1);
-            _gameUIService.ExperienceValueChanged(0, _levelService.GetExperienceTargetValue());
+            await _gameUIService.ExperienceValueChanged(0, _levelService.GetExperienceTargetValue());
             _ = _gameUIService.LevelChanged(_levelService.GetLevel());
             CreateEnemy();
         }
-
     }
     public void GameOver()
     {
@@ -77,7 +79,12 @@ public class GameService : IStartable
             totalExperience = _player.GetTotalExperienceValue(),
             level = _levelService.GetLevel(),
         };
-         _gameUIService.GameOver(data);
+        _gameUIService.GameOver(data);
+
+    }
+    public async UniTask PlayerHeartChanged()
+    {
+        await _gameUIService.SliderHeartValueChanged((int)_player._healt.GetHealt(), (int)_player._healt.FirstHealt);
     }
 }
 

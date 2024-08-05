@@ -1,10 +1,20 @@
 
+using UnityEngine;
 using UnityEngine.SceneManagement;
-
-public class SceneService 
+using VContainer;
+public enum SceneType
 {
-    public void LoadScene(string sceneName)
+    MainScene = 0,
+    GameScene = 1,
+}
+
+public class SceneService
+{
+    public void LoadScene(SceneType sceneType)
     {
-        SceneManager.LoadScene(sceneName);
+        SceneManager.LoadScene((int)sceneType);
+       
+        Time.timeScale = 1f;
     }
+
 }

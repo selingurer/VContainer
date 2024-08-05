@@ -1,23 +1,29 @@
 
 using UnityEngine;
 using UnityEngine.UI;
+using VContainer;
 
 public class MainMenu : MonoBehaviour
 {
-    [SerializeField] private Button btnPlayClicked;
-
+    [SerializeField] private Button _btnPlayClicked;
+    private SceneService _sceneService;
+    [Inject]
+    private void Construct(SceneService sceneService)
+    {
+       _sceneService = sceneService;
+    }
     private void Start()
     {
-        btnPlayClicked.onClick.AddListener(PlayBtnClicked);
+        _btnPlayClicked.onClick.AddListener(PlayBtnClicked);
     }
 
     private void OnDestroy()
     {
-        btnPlayClicked.onClick.RemoveListener(PlayBtnClicked);
+        _btnPlayClicked.onClick.RemoveListener(PlayBtnClicked);
     }
 
     private void PlayBtnClicked()
     {
-        
+        _sceneService.LoadScene(SceneType.GameScene);
     }
 }

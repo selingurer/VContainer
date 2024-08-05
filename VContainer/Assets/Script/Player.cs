@@ -32,7 +32,7 @@ public class Player : BaseCharacter
         _speed.SetSpeed(5f);
         _rigidbody = GetComponent<Rigidbody2D>();
         _attack.SetAttack(100);
-        _healt.SetHealt(200, this);
+        _healt.FirstHealt = 200;
         _healt.OnHealthChanged += (healt, chara) => { OnHealtChanged(healt, chara); };
     }
     private void OnDestroy()
@@ -94,15 +94,15 @@ public class Player : BaseCharacter
             _healt.SetHealt(_healt.GetHealt() - attack, this);
         }
     }
-    private void OnHealtChanged(float newHealt, BaseCharacter character)
+    private async UniTask OnHealtChanged(float newHealt, BaseCharacter character)
     {
         if (character == this)
         {
+            await _gameService.PlayerHeartChanged();
             if (newHealt <= 0)
             {
                 _gameService.GameOver();
             }
         }
-
     }
 }

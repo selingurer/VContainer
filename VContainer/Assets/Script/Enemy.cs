@@ -22,18 +22,18 @@ public class Enemy : BaseCharacter
             {
                 case EnemyType.Attack:
                     _attack.SetAttack(20);
-                    _healt.SetHealt(100, this);
+                    _healt.FirstHealt = 100;
                     this._speed.SetSpeed(3f);
                     gameObject.GetComponent<SpriteRenderer>().color = Color.blue;
                     break;
                 case EnemyType.Heart:
-                    _healt.SetHealt(110, this);
+                    _healt.FirstHealt = 110;
                     _attack.SetAttack(10);
                     this._speed.SetSpeed(3f);
                     gameObject.GetComponent<SpriteRenderer>().color = Color.red;
                     break;
                 case EnemyType.Speed:
-                    _healt.SetHealt(100, this);
+                    _healt.FirstHealt = 100;
                     _attack.SetAttack(10);
                     this._speed.SetSpeed(4f);
                     gameObject.GetComponent<SpriteRenderer>().color = Color.green;
