@@ -663,12 +663,12 @@ GameObject:
   - component: {fileID: 471888264}
   - component: {fileID: 471888263}
   m_Layer: 5
-  m_Name: PlayerPerkPanel
+  m_Name: PlayerSkinPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &471888262
 RectTransform:
   m_ObjectHideFlags: 0
@@ -703,7 +703,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 0, g: 0, b: 0, a: 0.8627451}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -2153,8 +2153,8 @@ MonoBehaviour:
   txtLevel: {fileID: 1686777620}
   btnContinue: {fileID: 1784770590}
   sliderHeart: {fileID: 2020287229}
-  contentRewards: {fileID: 1610942438}
-  rewards: {fileID: 2950318797301161131, guid: b592e56c842cabb4b90c0780c9683a44, type: 3}
+  contentSkill: {fileID: 1610942438}
+  _objectSkill: {fileID: 7739459063204595473, guid: b592e56c842cabb4b90c0780c9683a44, type: 3}
 --- !u!222 &1925402902
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2521,6 +2521,10 @@ PrefabInstance:
       propertyPath: objPlayer
       value: 
       objectReference: {fileID: 384854059}
+    - target: {fileID: 1463004499136810113, guid: dce689a2458eada4d8c8ef57d686330d, type: 3}
+      propertyPath: objSkillUI
+      value: 
+      objectReference: {fileID: 7739459063204595473, guid: b592e56c842cabb4b90c0780c9683a44, type: 3}
     - target: {fileID: 1463004499136810113, guid: dce689a2458eada4d8c8ef57d686330d, type: 3}
       propertyPath: gameUIPanel
       value: 

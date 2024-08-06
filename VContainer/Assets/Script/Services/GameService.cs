@@ -14,17 +14,19 @@ public class GameService : IStartable
     private EnemyService _enemyService;
     private GameUIPanel _gameUIService;
     private ExperienceService _experienceService;
-
+    private SkillService _skillService;
     [Inject]
-    private void Construct(ILevelService service, IObjectResolver resolver, Player player, ObjectPool<Enemy> enemyPool, ObjectPool<Experience> expool, EnemyService enemyService, ExperienceService experienceService, GameUIPanel gameUIService)
+    private void Construct(ILevelService levelService, IObjectResolver resolver, Player player, ObjectPool<Enemy> enemyPool,
+        ObjectPool<Experience> experiencePool, EnemyService enemyService, ExperienceService experienceService, GameUIPanel gameUIService,SkillService skillService)
     {
-        _levelService = service;
-        _player = player;
+        _levelService = levelService;
         _enemyPool = enemyPool;
+        _experiencePool = experiencePool;
         _enemyService = enemyService;
         _experienceService = experienceService;
         _gameUIService = gameUIService;
-        _experiencePool = expool;
+        _skillService = skillService;
+        _player = player;
     }
 
     void IStartable.Start()
@@ -51,8 +53,9 @@ public class GameService : IStartable
             _player.SetExperienceValue(0);
             _levelService.SetLevel(_levelService.GetLevel() + 1);
             await _gameUIService.ExperienceValueChanged(0, _levelService.GetExperienceTargetValue());
-            _ = _gameUIService.LevelChanged(_levelService.GetLevel());
             _enemyService.CreateEnemy();
+            await _gameUIService.LevelChanged(_levelService.GetLevel());
+            _gameUIService.CreateSkill(_skillService.GetSkillList());
         }
     }
     public void GameOver()

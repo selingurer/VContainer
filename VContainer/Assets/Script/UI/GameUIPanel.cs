@@ -1,10 +1,8 @@
-using Assets.Script.Feature.Rewards;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using System;
-using Unity.Collections.LowLevel.Unsafe;
+using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using VContainer;
 
@@ -28,13 +26,14 @@ public class GameUIPanel : MonoBehaviour
     [SerializeField] private Text txtLevel;
     [SerializeField] private Button btnContinue;
     [SerializeField] private Slider sliderHeart;
-    [SerializeField] private Transform contentRewards;
-    [SerializeField] Rewards rewards;
+    [SerializeField] private Transform contentSkill;
+    [SerializeField] SkillUI _objectSkill;
     private SceneService _sceneService;
+    private List<SkillUI> _skillList = new List<SkillUI>();
     [Inject]
     private void Construct(SceneService sceneService)
     {
-        _sceneService = sceneService;   
+        _sceneService = sceneService;
     }
     private void Awake()
     {
@@ -65,7 +64,6 @@ public class GameUIPanel : MonoBehaviour
         txtLevel.gameObject.transform.DOScale(1, 0.5f).SetUpdate(true);
         Time.timeScale = 0f;
         await UniTask.Delay(TimeSpan.FromSeconds(1), ignoreTimeScale: true);
-        Time.timeScale = 1f;
         txtLevel.gameObject.transform.DOScale(0, 0.5f).SetUpdate(true);
     }
     public void GameOver(GameOverData data)
@@ -76,8 +74,24 @@ public class GameUIPanel : MonoBehaviour
         _gameOverObj.txtLevel.text = data.level.ToString();
         _gameOverObj.txtTotalExperience.text = data.totalExperience.ToString();
     }
-    public void CreateRewards()
+    public void CreateSkill(List<Skill> skillList)
     {
-        var reward = Instantiate(rewards, contentRewards);
+        contentSkill.parent.gameObject.SetActive(true);
+        foreach (var skill in skillList)
+        {
+            var objectSkill = Instantiate(_objectSkill, contentSkill);
+            objectSkill._skill = skill;
+            objectSkill.SetSkillData(skill.Data);
+            _skillList.Add(objectSkill);
+        }
+    }
+    public void ClearSkill()
+    {
+        foreach(var objSkill in _skillList)
+        {
+            Destroy(objSkill);
+            
+        }
+        _skillList.Clear();
     }
 }

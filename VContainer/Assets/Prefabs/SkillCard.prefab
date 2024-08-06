@@ -14,9 +14,9 @@ GameObject:
   - component: {fileID: 1969686124510682823}
   - component: {fileID: 6058144259249514450}
   - component: {fileID: 907570868256861719}
-  - component: {fileID: 2950318797301161131}
+  - component: {fileID: 7739459063204595473}
   m_Layer: 5
-  m_Name: RewardCard
+  m_Name: SkillCard
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -160,7 +160,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &2950318797301161131
+--- !u!114 &7739459063204595473
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -169,11 +169,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1946763125460307324}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a31da56199e6fce4a90736f03e232726, type: 3}
+  m_Script: {fileID: 11500000, guid: d998d5d45f6e6ef48b924f4c6218aa0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  imgIcon: {fileID: 1323152808952883934}
-  txtDesc: {fileID: 807258131359352711}
+  btnSkill: {fileID: 907570868256861719}
+  skillText: {fileID: 807258131359352711}
+  imgSkill: {fileID: 1323152808952883934}
 --- !u!1 &4695667649106547517
 GameObject:
   m_ObjectHideFlags: 0

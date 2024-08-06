@@ -30,6 +30,7 @@ public class Player : BaseCharacter
     private void Awake()
     {
         _speed.SetSpeed(5f);
+        _enemyService._player = this;
         _rigidbody = GetComponent<Rigidbody2D>();
         _attack.SetAttack(100);
         _healt.FirstHealt = 200;

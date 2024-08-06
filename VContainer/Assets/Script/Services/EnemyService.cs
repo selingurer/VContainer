@@ -1,10 +1,7 @@
-
-using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
-using static UnityEditor.Experimental.GraphView.GraphView;
 
 namespace Assets.Script.Services
 {
@@ -14,13 +11,12 @@ namespace Assets.Script.Services
         public List<Enemy> _ActiveEnemyList = new List<Enemy>();
         public ObjectPool<Enemy> _enemyPool;
         private ILevelService _levelService;
-        private Player _player;
+        public Player _player;
 
         [Inject]
-        private void Construct(ILevelService levelServis,Player player)
+        private void Construct(ILevelService levelServis)
         {
             _levelService = levelServis;
-            _player = player;
         }
        
         public Enemy GetClosestEnemy(Vector3 origin)
@@ -59,7 +55,7 @@ namespace Assets.Script.Services
             _experienceService.GetExperience(enemy.transform.position);
             _enemyPool.ReturnToPool(enemy);
             _ActiveEnemyList.Remove(enemy);
-            if(_ActiveEnemyList.Count < 5)
+            if(_ActiveEnemyList.Count < 10)
             {
                 CreateEnemy();
             }
