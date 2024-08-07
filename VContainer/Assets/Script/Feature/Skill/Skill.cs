@@ -1,3 +1,4 @@
+using Assets.Script.Services;
 using UnityEngine;
 using VContainer;
 
@@ -6,13 +7,14 @@ public class SkillData
     public Sprite SpriteSkill;
     public string DescSkill;
 }
-public class Skill : ISkill
+public class Skill
 {
     public ISkillService _skillService;
-    public SkillTypes _skillTypes;
+    public SkillTypes _skillTypes { get; set; }
     public Player _player;
+    public EnemyService _enemyService;
+    public GameUIPanel _gameUIPanel;
     private SkillData _data;
-    private GameUIPanel _gameUIPanel;
     public SkillData Data
     {
         get => _data;
@@ -23,14 +25,13 @@ public class Skill : ISkill
         }
     }
 
-    public SkillTypes SkillTypes => _skillTypes;
-
     [Inject]
-    private void Construct(ISkillService skillService, Player player,GameUIPanel gameUIPanel)
+    private void Construct(ISkillService skillService, Player player,GameUIPanel gameUIPanel,EnemyService enemyService)
     {
         _skillService = skillService;
         _player = player;
         _gameUIPanel = gameUIPanel;
+        _enemyService = enemyService;
     }
 
     public void SelectSkill()

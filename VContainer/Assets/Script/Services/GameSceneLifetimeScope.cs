@@ -13,7 +13,8 @@ public class GameSceneLifetimeScope : LifetimeScope
     [SerializeField] private Bullet objBullet;
     [SerializeField] private Experience objExperience;
     [SerializeField] private GameUIPanel gameUIPanel;
-    [SerializeField] private SkillUI objSkillUI;
+    [SerializeField] private SkillCardUI objSkillUI;
+    [SerializeField] private SkillUIBase objBaseSkill;
     protected override void Configure(IContainerBuilder builder)
     {
         builder.Register<LevelService>(Lifetime.Singleton).AsImplementedInterfaces();
@@ -29,7 +30,8 @@ public class GameSceneLifetimeScope : LifetimeScope
         builder.Register<ObjectPool<Enemy>>(Lifetime.Singleton).WithParameter(objEnemyPrefab).WithParameter(20);
         builder.Register<ObjectPool<Bullet>>(Lifetime.Singleton).WithParameter(objBullet).WithParameter(20);
         builder.Register<ObjectPool<Experience>>(Lifetime.Singleton).WithParameter(objExperience).WithParameter(20);
-        builder.Register<Skill>(Lifetime.Transient).AsImplementedInterfaces();
+
+        builder.Register<Skill>(Lifetime.Transient).AsSelf();
         builder.Register<ExperienceService>(Lifetime.Singleton).AsSelf();
         builder.Register<EnemyService>(Lifetime.Singleton).AsSelf();
         builder.Register<Experience>(Lifetime.Transient);
@@ -42,5 +44,6 @@ public class GameSceneLifetimeScope : LifetimeScope
 
         builder.Register<SkillSpeed>(Lifetime.Singleton).AsImplementedInterfaces();
         builder.Register<SkillHeart>(Lifetime.Singleton).AsImplementedInterfaces();
+        builder.Register<SkillShield>(Lifetime.Singleton).AsImplementedInterfaces();
     }
 }

@@ -30,7 +30,7 @@ public class ExperienceService : IStartable ,IDisposable
     }
     private async UniTaskVoid DestroyExperience(Experience experience)
     {
-        await UniTask.Delay(TimeSpan.FromSeconds(5), ignoreTimeScale: true);
+        await UniTask.Delay(TimeSpan.FromSeconds(10));
         if(experience!= null) ReturnToExperiencePool(experience);
     }
     public void Start()

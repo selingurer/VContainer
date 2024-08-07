@@ -17,6 +17,7 @@ public class Player : BaseCharacter
     private int _experienceValue;
     private int _totalExperienceValue;
     public GameService _gameService;
+    public bool _shield = false;
 
     [Inject]
     private void Construct(ISpeed speed, IHealt healt, IAttack attack, ObjectPool<Bullet> bulletPool, EnemyService enemyService)
@@ -29,7 +30,7 @@ public class Player : BaseCharacter
     }
     private void Awake()
     {
-        _speed.SetSpeed(5f);
+        _speed.SetSpeed(4.5f);
         _enemyService._player = this;
         _rigidbody = GetComponent<Rigidbody2D>();
         _attack.SetAttack(100);
@@ -91,6 +92,9 @@ public class Player : BaseCharacter
     {
         if (collision.GetComponent<Enemy>() != null)
         {
+            if (_shield)
+                return;
+
             float attack = collision.gameObject.GetComponent<Enemy>()._attack.GetAttack();
             _healt.SetHealt(_healt.GetHealt() - attack, this);
         }

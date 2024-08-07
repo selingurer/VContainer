@@ -12,9 +12,8 @@ public class SceneService
 {
     public void LoadScene(SceneType sceneType)
     {
-        SceneManager.LoadScene((int)sceneType);
-       
         Time.timeScale = 1f;
+        SceneManager.LoadSceneAsync((int)sceneType);
     }
 
 }

@@ -21,19 +21,23 @@ public class GameOverData
 
 public class GameUIPanel : MonoBehaviour
 {
+    [SerializeField] private SkillUIBase skillUIObject;
     [SerializeField] private GameOverObj _gameOverObj;
     [SerializeField] private Slider sliderExperience;
     [SerializeField] private Text txtLevel;
     [SerializeField] private Button btnContinue;
     [SerializeField] private Slider sliderHeart;
     [SerializeField] private Transform contentSkill;
-    [SerializeField] SkillUI _objectSkill;
+    [SerializeField] SkillCardUI _objectSkillCard;
+
     private SceneService _sceneService;
-    private List<SkillUI> _skillList = new List<SkillUI>();
+    private List<SkillCardUI> _skillList = new List<SkillCardUI>();
+    private Player _player;
     [Inject]
-    private void Construct(SceneService sceneService)
+    private void Construct(SceneService sceneService, Player player)
     {
         _sceneService = sceneService;
+        _player = player;
     }
     private void Awake()
     {
@@ -79,7 +83,7 @@ public class GameUIPanel : MonoBehaviour
         contentSkill.parent.gameObject.SetActive(true);
         foreach (var skill in skillList)
         {
-            var objectSkill = Instantiate(_objectSkill, contentSkill);
+            var objectSkill = Instantiate(_objectSkillCard, contentSkill);
             objectSkill._skill = skill;
             objectSkill.SetSkillData(skill.Data);
             _skillList.Add(objectSkill);
@@ -87,11 +91,21 @@ public class GameUIPanel : MonoBehaviour
     }
     public void ClearSkill()
     {
-        foreach(var objSkill in _skillList)
+        foreach (var objSkill in _skillList)
         {
-            Destroy(objSkill);
-            
+            Destroy(objSkill.gameObject);
+
         }
         _skillList.Clear();
     }
+    public async UniTask CreateSkillGameObject()
+    {
+
+        var objectSkill = Instantiate(skillUIObject);
+        objectSkill.transform.SetParent(_player.transform, false);
+        await UniTask.Delay(10000);
+        Destroy(objectSkill.gameObject);
+
+    }
+
 }

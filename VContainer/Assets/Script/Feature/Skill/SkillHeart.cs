@@ -16,6 +16,7 @@ public class SkillHeart : Skill, IStartable
 
     void IStartable.Start()
     {
+        _skillTypes = SkillTypes.HeartPlayer;
         Data = new SkillData
         {
             DescSkill = "Can hasarýný %100 iyileþtirir.",

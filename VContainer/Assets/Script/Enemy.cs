@@ -23,20 +23,20 @@ public class Enemy : BaseCharacter
                 case EnemyType.Attack:
                     _attack.SetAttack(20);
                     _healt.FirstHealt = 100;
-                    this._speed.SetSpeed(3f);
-                    gameObject.GetComponent<SpriteRenderer>().color = Color.blue;
+                    this._speed.SetSpeed(2f);
+                    gameObject.GetComponent<SpriteRenderer>().color = Color.green;
                     break;
                 case EnemyType.Heart:
                     _healt.FirstHealt = 110;
                     _attack.SetAttack(10);
-                    this._speed.SetSpeed(3f);
-                    gameObject.GetComponent<SpriteRenderer>().color = Color.red;
+                    this._speed.SetSpeed(2f);
+                    gameObject.GetComponent<SpriteRenderer>().color = Color.white;
                     break;
                 case EnemyType.Speed:
                     _healt.FirstHealt = 100;
                     _attack.SetAttack(10);
-                    this._speed.SetSpeed(4f);
-                    gameObject.GetComponent<SpriteRenderer>().color = Color.green;
+                    this._speed.SetSpeed(3f);
+                    gameObject.GetComponent<SpriteRenderer>().color = Color.red;
                     break;
             }
         }

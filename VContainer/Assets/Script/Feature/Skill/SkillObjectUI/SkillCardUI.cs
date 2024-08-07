@@ -1,8 +1,7 @@
-using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class SkillUI : MonoBehaviour
+public class SkillCardUI : MonoBehaviour
 {
     [SerializeField] private Button btnSkill;
     [SerializeField] private Text skillText;

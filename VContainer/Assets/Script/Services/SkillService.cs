@@ -5,8 +5,10 @@ using VContainer.Unity;
 public enum SkillTypes
 {
     SpeedPlayer = 0,
+    ShieldPlayer = 1,
+    HeartPlayer = 2
 }
-public class SkillService : ISkillService , IStartable
+public class SkillService : ISkillService, IStartable
 {
     public List<Skill> _skillList { get; set; }
 
@@ -47,6 +49,6 @@ public class SkillService : ISkillService , IStartable
 
     public void Start()
     {
-       _skillList = new List<Skill>();
+        _skillList = new List<Skill>();
     }
 }

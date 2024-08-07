@@ -37,9 +37,9 @@ namespace Assets.Script.Services
             List<Vector2> vectorList = new List<Vector2>();
             for (int i = 0; i < _levelService.GetInitialPoolSize(); i++)
             {
-                int x = Random.Range(-40, 40);
+                int x = Random.Range(-30, 30);
                 int xV = x == _player.transform.position.x ? 30 : x;
-                int y = Random.Range(-40, 40);
+                int y = Random.Range(-30,30);
                 int yV = y == _player.transform.position.y ? 30 : y;
                 vectorList.Add(new Vector2(_player.transform.position.x + xV, _player.transform.position.y + yV));
             }
