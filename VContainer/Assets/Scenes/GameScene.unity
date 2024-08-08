@@ -431,6 +431,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 2912110318084710860, guid: 39cdf67671f3cf74086b977dc95c81c3, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 7493377577384212998, guid: 39cdf67671f3cf74086b977dc95c81c3, type: 3}
       propertyPath: _joystick
       value: 

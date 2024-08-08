@@ -2,7 +2,6 @@ using System;
 
 public class Healt : IHealt
 {
-
     private float _healt;
     private float _firstHealt;
     public Action<float, BaseCharacter> OnHealthChanged { get; set; }
