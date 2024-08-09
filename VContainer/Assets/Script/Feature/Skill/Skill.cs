@@ -11,7 +11,7 @@ public class Skill
 {
     public ISkillService _skillService;
     public SkillTypes _skillTypes { get; set; }
-    public Player _player;
+    public PlayerView _player;
     public EnemyService _enemyService;
     public GameUIPanel _gameUIPanel;
     private SkillData _data;
@@ -26,7 +26,7 @@ public class Skill
     }
 
     [Inject]
-    private void Construct(ISkillService skillService, Player player,GameUIPanel gameUIPanel,EnemyService enemyService)
+    private void Construct(ISkillService skillService, PlayerView player,GameUIPanel gameUIPanel,EnemyService enemyService)
     {
         _skillService = skillService;
         _player = player;

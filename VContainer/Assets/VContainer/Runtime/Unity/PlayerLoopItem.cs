@@ -149,12 +149,12 @@ namespace VContainer.Unity
 
     sealed class TickableLoopItem : IPlayerLoopItem, IDisposable
     {
-        readonly IReadOnlyList<ITickable> entries;
+        readonly IReadOnlyList<IFixedTickable> entries;
         readonly EntryPointExceptionHandler exceptionHandler;
         bool disposed;
 
         public TickableLoopItem(
-            IReadOnlyList<ITickable> entries,
+            IReadOnlyList<IFixedTickable> entries,
             EntryPointExceptionHandler exceptionHandler)
         {
             this.entries = entries;

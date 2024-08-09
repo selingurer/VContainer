@@ -10,13 +10,13 @@ public class GameService : IStartable
     private ILevelService _levelService;
     private ObjectPool<Enemy> _enemyPool;
     private ObjectPool<Experience> _experiencePool;
-    private Player _player;
+    private PlayerView _player;
     private EnemyService _enemyService;
     private GameUIPanel _gameUIService;
     private ExperienceService _experienceService;
     private SkillService _skillService;
     [Inject]
-    private void Construct(ILevelService levelService, IObjectResolver resolver, Player player, ObjectPool<Enemy> enemyPool,
+    private void Construct(ILevelService levelService, IObjectResolver resolver, PlayerView player, ObjectPool<Enemy> enemyPool,
         ObjectPool<Experience> experiencePool, EnemyService enemyService, ExperienceService experienceService, GameUIPanel gameUIService,SkillService skillService)
     {
         _levelService = levelService;
@@ -38,7 +38,7 @@ public class GameService : IStartable
         _enemyService._experienceService = _experienceService;
         _experienceService._gameService = this;
         _player._gameService = this;
-        float playerHeartValue = _player._healt.GetHealt();
+        float playerHeartValue = _player.Healt;
         _gameUIService.SliderHeartValueChanged((int)playerHeartValue, (int)playerHeartValue);
     }
 
@@ -70,7 +70,7 @@ public class GameService : IStartable
     }
     public async UniTask PlayerHeartChanged()
     {
-        await _gameUIService.SliderHeartValueChanged((int)_player._healt.GetHealt(), (int)_player._healt.FirstHealt);
+        await _gameUIService.SliderHeartValueChanged((int)_player.Healt, (int)_player.FirstHealt);
     }
 }
 

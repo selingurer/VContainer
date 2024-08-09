@@ -32,9 +32,9 @@ public class GameUIPanel : MonoBehaviour
 
     private SceneService _sceneService;
     private List<SkillCardUI> _skillList = new List<SkillCardUI>();
-    private Player _player;
+    private PlayerView _player;
     [Inject]
-    private void Construct(SceneService sceneService, Player player)
+    private void Construct(SceneService sceneService, PlayerView player)
     {
         _sceneService = sceneService;
         _player = player;

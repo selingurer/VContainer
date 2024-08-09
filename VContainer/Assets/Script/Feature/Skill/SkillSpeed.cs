@@ -7,10 +7,8 @@ public class SkillSpeed : Skill, IStartable
     
     protected override void SetSkill()
     {
-        Debug.LogError(_player._speed.GetSpeed());
         base.SetSkill();
-        _player._speed.SetSpeed(_player._speed.GetSpeed() * _speedBoost);
-        Debug.LogError(_player._speed.GetSpeed());
+        _player.SetSpeed(_player.Speed * _speedBoost);
     }
 
     public void Start()

@@ -9,11 +9,29 @@ public enum EnemyType
     Speed = 2,
 }
 
-public class Enemy : BaseCharacter
+public class Enemy : MonoBehaviour
 {
     private Rigidbody2D _rigidbody;
-    private Player _player;
+    private PlayerView _player;
     private EnemyService _enemyService;
+    private int _attack;
+    public int Attack => _attack;
+    private float _speed;
+    public float Speed => _speed;
+
+    private float _healt;
+    public float Healt
+    {
+        get => _healt;
+        set
+        {
+            _healt = value;
+            if (_healt <= 0)
+            {
+                _enemyService.EnemyReturnToPool(this);
+            }
+        }
+    }
     private EnemyType _enemyType
     {
         set
@@ -21,33 +39,30 @@ public class Enemy : BaseCharacter
             switch (value)
             {
                 case EnemyType.Attack:
-                    _attack.SetAttack(20);
-                    _healt.FirstHealt = 100;
-                    this._speed.SetSpeed(2f);
+                    _attack = 20;
+                    _healt = 100;
+                    this._speed = 2f;
                     gameObject.GetComponent<SpriteRenderer>().color = Color.green;
                     break;
                 case EnemyType.Heart:
-                    _healt.FirstHealt = 110;
-                    _attack.SetAttack(10);
-                    this._speed.SetSpeed(2f);
+                    _healt = 110;
+                    _attack = 10;
+                    this._speed = 2f;
                     gameObject.GetComponent<SpriteRenderer>().color = Color.white;
                     break;
                 case EnemyType.Speed:
-                    _healt.FirstHealt = 100;
-                    _attack.SetAttack(10);
-                    this._speed.SetSpeed(3f);
+                    _healt = 100;
+                    _attack = 10;
+                    this._speed = 3f;
                     gameObject.GetComponent<SpriteRenderer>().color = Color.red;
                     break;
             }
         }
     }
     [Inject]
-    private void Construct(ISpeed speed, IHealt healt, IAttack attack, Player player, EnemyService service)
+    private void Construct( PlayerView player, EnemyService service)
     {
-        _speed = speed;
-        _healt = healt;
-        _attack = attack;
-        _player = player;
+        _player = player; 
         _enemyService = service;
     }
     private void Awake()
@@ -55,24 +70,8 @@ public class Enemy : BaseCharacter
         _rigidbody = GetComponent<Rigidbody2D>();
         int rnd = Random.Range(0, 3);
         _enemyType = (EnemyType)rnd;
-        _healt.OnHealthChanged += (healt, chara) => { OnHealtChanged(healt, chara); };
     }
 
-    private void OnHealtChanged(float newHealt, BaseCharacter character)
-    {
-        if (character == this)
-        {
-            if (newHealt <= 0)
-            {
-                _enemyService.EnemyReturnToPool(this);
-            }
-        }
-
-    }
-    private void OnDisable()
-    {
-        _healt.OnHealthChanged -= (healt, chara) => { OnHealtChanged(healt, chara); };
-    }
     private void FixedUpdate()
     {
         MoveTowardsPlayer();
@@ -83,7 +82,7 @@ public class Enemy : BaseCharacter
         Vector2 direction = (_player.transform.position - transform.position).normalized;
 
         // Hýz vektörünü hesapla
-        Vector2 velocity = direction * _speed.GetSpeed();
+        Vector2 velocity = direction * _speed;
 
         // Rigidbody2D'nin hýzýný ayarla
         _rigidbody.velocity = velocity;

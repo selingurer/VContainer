@@ -8,10 +8,8 @@ public class SkillHeart : Skill, IStartable
 
     protected override void SetSkill()
     {
-        Debug.LogError(_player._speed.GetSpeed());
         base.SetSkill();
-        _player._healt.SetHealt(_player._healt.FirstHealt, _player);
-        Debug.LogError(_player._speed.GetSpeed());
+        _player.Healt =_player.FirstHealt;
     }
 
     void IStartable.Start()

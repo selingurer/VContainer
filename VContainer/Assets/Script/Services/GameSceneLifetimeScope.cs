@@ -9,7 +9,7 @@ public class GameSceneLifetimeScope : LifetimeScope
 {
     [SerializeField] private Enemy objEnemyPrefab;
     [SerializeField] private Transform transformEnemy;
-    [SerializeField] private Player objPlayer;
+    [SerializeField] private PlayerView objPlayer;
     [SerializeField] private Bullet objBullet;
     [SerializeField] private Experience objExperience;
     [SerializeField] private GameUIPanel gameUIPanel;
@@ -18,9 +18,6 @@ public class GameSceneLifetimeScope : LifetimeScope
     protected override void Configure(IContainerBuilder builder)
     {
         builder.Register<LevelService>(Lifetime.Singleton).AsImplementedInterfaces();
-        builder.Register<Speed>(Lifetime.Transient).AsImplementedInterfaces().AsSelf();
-        builder.Register<Healt>(Lifetime.Transient).AsImplementedInterfaces();
-        builder.Register<Attack>(Lifetime.Transient).AsImplementedInterfaces();
         builder.RegisterInstance(objBullet);
         builder.RegisterInstance(gameUIPanel);
         builder.RegisterInstance(objSkillUI);

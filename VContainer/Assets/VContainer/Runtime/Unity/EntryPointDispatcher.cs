@@ -88,7 +88,7 @@ namespace VContainer.Unity
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.PostFixedUpdate, loopItem);
             }
 
-            var tickables = container.Resolve<ContainerLocal<IReadOnlyList<ITickable>>>().Value;
+            var tickables = container.Resolve<ContainerLocal<IReadOnlyList<IFixedTickable>>>().Value;
             if (tickables.Count > 0)
             {
                 var loopItem = new TickableLoopItem(tickables, exceptionHandler);

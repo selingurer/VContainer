@@ -1,6 +1,6 @@
 namespace VContainer.Unity
 {
-    public interface ITickable
+    public interface IFixedTickable
     {
         void Tick();
     }

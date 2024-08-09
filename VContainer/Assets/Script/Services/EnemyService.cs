@@ -11,7 +11,7 @@ namespace Assets.Script.Services
         public List<Enemy> _ActiveEnemyList = new List<Enemy>();
         public ObjectPool<Enemy> _enemyPool;
         private ILevelService _levelService;
-        public Player _player;
+        public PlayerView _player;
 
         [Inject]
         private void Construct(ILevelService levelServis)
