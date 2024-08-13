@@ -2143,7 +2143,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 166bd740040f193408684b41ee86de8b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  skillUIObject: {fileID: 2239360407388380423, guid: cf324630ce9b4ec47982df95956a939d, type: 3}
   _gameOverObj:
     txtLevel: {fileID: 1961590567}
     txtTotalExperience: {fileID: 961663821}
@@ -2525,9 +2524,17 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 7739459063204595473, guid: b592e56c842cabb4b90c0780c9683a44, type: 3}
     - target: {fileID: 1463004499136810113, guid: dce689a2458eada4d8c8ef57d686330d, type: 3}
+      propertyPath: playerData
+      value: 
+      objectReference: {fileID: 11400000, guid: d31ce5ee91d2d8a4592aa14279c9d970, type: 2}
+    - target: {fileID: 1463004499136810113, guid: dce689a2458eada4d8c8ef57d686330d, type: 3}
       propertyPath: gameUIPanel
       value: 
       objectReference: {fileID: 1925402901}
+    - target: {fileID: 1463004499136810113, guid: dce689a2458eada4d8c8ef57d686330d, type: 3}
+      propertyPath: objBaseSkill
+      value: 
+      objectReference: {fileID: 2239360407388380423, guid: cf324630ce9b4ec47982df95956a939d, type: 3}
     - target: {fileID: 1463004499136810113, guid: dce689a2458eada4d8c8ef57d686330d, type: 3}
       propertyPath: gameUIService
       value: 
@@ -2536,6 +2543,14 @@ PrefabInstance:
       propertyPath: objExperience
       value: 
       objectReference: {fileID: 1544778523935093385, guid: 0b2b85c5d9f5fac43ba4dcb5f0ec28be, type: 3}
+    - target: {fileID: 1463004499136810113, guid: dce689a2458eada4d8c8ef57d686330d, type: 3}
+      propertyPath: objSheildSkill
+      value: 
+      objectReference: {fileID: 676207989686228666, guid: cf324630ce9b4ec47982df95956a939d, type: 3}
+    - target: {fileID: 1463004499136810113, guid: dce689a2458eada4d8c8ef57d686330d, type: 3}
+      propertyPath: objSkillCardUI
+      value: 
+      objectReference: {fileID: 7739459063204595473, guid: b592e56c842cabb4b90c0780c9683a44, type: 3}
     - target: {fileID: 1463004499136810113, guid: dce689a2458eada4d8c8ef57d686330d, type: 3}
       propertyPath: transformEnemy
       value: 

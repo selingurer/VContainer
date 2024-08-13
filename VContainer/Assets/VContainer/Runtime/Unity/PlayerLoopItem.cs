@@ -168,7 +168,7 @@ namespace VContainer.Unity
             {
                 try
                 {
-                    entries[i].Tick();
+                    entries[i].FixedTick();
                 }
                 catch (Exception ex)
                 {

@@ -2,8 +2,8 @@ using System.Collections.Generic;
 
 public interface ISkillService
 {
-    public List<Skill> _skillList { get; set; }
-    public List<Skill> GetSkillList();
-    public void AddSkill(Skill skill);
-    public void SelectedSkill(SkillTypes types, Skill reward);
+    public SkillDataList _skillList { get; set; }
+    public List<SkillData> GetSkillList();
+    public void AddSkill();
+    public void SelectedSkill(SkillTypes types, SkillData skill);
 }

@@ -21,7 +21,6 @@ public class GameOverData
 
 public class GameUIPanel : MonoBehaviour
 {
-    [SerializeField] private SkillUIBase skillUIObject;
     [SerializeField] private GameOverObj _gameOverObj;
     [SerializeField] private Slider sliderExperience;
     [SerializeField] private Text txtLevel;
@@ -32,12 +31,10 @@ public class GameUIPanel : MonoBehaviour
 
     private SceneService _sceneService;
     private List<SkillCardUI> _skillList = new List<SkillCardUI>();
-    private PlayerView _player;
     [Inject]
-    private void Construct(SceneService sceneService, PlayerView player)
+    private void Construct(SceneService sceneService)
     {
         _sceneService = sceneService;
-        _player = player;
     }
     private void Awake()
     {
@@ -78,14 +75,13 @@ public class GameUIPanel : MonoBehaviour
         _gameOverObj.txtLevel.text = data.level.ToString();
         _gameOverObj.txtTotalExperience.text = data.totalExperience.ToString();
     }
-    public void CreateSkill(List<Skill> skillList)
+    public void CreateSkill(List<SkillData> skillList)
     {
         contentSkill.parent.gameObject.SetActive(true);
         foreach (var skill in skillList)
         {
             var objectSkill = Instantiate(_objectSkillCard, contentSkill);
-            objectSkill._skill = skill;
-            objectSkill.SetSkillData(skill.Data);
+            objectSkill.SetSkillData(skill);
             _skillList.Add(objectSkill);
         }
     }
@@ -97,15 +93,6 @@ public class GameUIPanel : MonoBehaviour
 
         }
         _skillList.Clear();
-    }
-    public async UniTask CreateSkillGameObject()
-    {
-
-        var objectSkill = Instantiate(skillUIObject);
-        objectSkill.transform.SetParent(_player.transform, false);
-        await UniTask.Delay(10000);
-        Destroy(objectSkill.gameObject);
-
     }
 
 }

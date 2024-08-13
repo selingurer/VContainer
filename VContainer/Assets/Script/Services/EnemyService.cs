@@ -1,24 +1,24 @@
+using Cysharp.Threading.Tasks;
+using System;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 using VContainer;
-using VContainer.Unity;
 
 namespace Assets.Script.Services
 {
-    public class EnemyService : IStartable
+    public class EnemyService : IDisposable
     {
-        public ExperienceService _experienceService;
         public List<Enemy> _ActiveEnemyList = new List<Enemy>();
-        public ObjectPool<Enemy> _enemyPool;
-        private ILevelService _levelService;
-        public PlayerView _player;
+        [Inject] private ObjectPool<Enemy> _enemyPool;
+        private CancellationTokenSource cancellationTokenSource;
+        public Action<Vector3> EnemyDead;
 
-        [Inject]
-        private void Construct(ILevelService levelServis)
+      
+        public EnemyService()
         {
-            _levelService = levelServis;
+            cancellationTokenSource = new CancellationTokenSource();
         }
-       
         public Enemy GetClosestEnemy(Vector3 origin)
         {
 
@@ -32,39 +32,59 @@ namespace Assets.Script.Services
             }
             return null;
         }
-        public void CreateEnemy()
+        public async UniTask CreateEnemyAsync(Vector3 playerPos, int initialPoolSize)
+        {
+            try
+            {
+                while (!cancellationTokenSource.IsCancellationRequested)
+                {
+                    CreateEnemy(playerPos, initialPoolSize);
+                    await UniTask.Delay(20000, cancellationToken: cancellationTokenSource.Token);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                Debug.Log("Enemy creation task was canceled.");
+            }
+        }
+        private void CreateEnemy(Vector3 playerPos, int initialPoolSize)
         {
             List<Vector2> vectorList = new List<Vector2>();
-            for (int i = 0; i < _levelService.GetInitialPoolSize(); i++)
+            for (int i = 0; i < initialPoolSize; i++)
             {
-                int x = Random.Range(-30, 30);
-                int xV = x == _player.transform.position.x ? 30 : x;
-                int y = Random.Range(-30,30);
-                int yV = y == _player.transform.position.y ? 30 : y;
-                vectorList.Add(new Vector2(_player.transform.position.x + xV, _player.transform.position.y + yV));
+                int x = UnityEngine.Random.Range(-30, 30);
+                int xV = x == playerPos.x ? 30 : x;
+                int y = UnityEngine.Random.Range(-30, 30);
+                int yV = y == playerPos.y ? 30 : y;
+                vectorList.Add(new Vector2(playerPos.x + xV, playerPos.y + yV));
             }
-            for (int i = 0; i < _levelService.GetInitialPoolSize(); i++)
+            for (int i = 0; i < initialPoolSize; i++)
             {
                 var obj = _enemyPool.Get();
                 obj.gameObject.transform.position = vectorList[i];
                 _ActiveEnemyList.Add(obj);
-            }
+                obj.enemyDead += (enemy) =>
+                {
+                    EnemyReturnToPool(enemy);
+                    obj.enemyDead -= (enemy) => EnemyReturnToPool(enemy);
+                };
+                }
         }
         public void EnemyReturnToPool(Enemy enemy)
         {
-            _experienceService.GetExperience(enemy.transform.position);
+            EnemyDead?.Invoke(enemy.transform.position);
             _enemyPool.ReturnToPool(enemy);
             _ActiveEnemyList.Remove(enemy);
-            if(_ActiveEnemyList.Count < 10)
+        }
+
+        public void Dispose()
+        {
+            if (cancellationTokenSource != null)
             {
-                CreateEnemy();
+                cancellationTokenSource.Cancel();
+                cancellationTokenSource.Dispose();
+                cancellationTokenSource = null;
             }
         }
-
-        public void Start()
-        {
-            throw new System.NotImplementedException();
-        }
-
     }
 }

@@ -10,10 +10,6 @@ public class Bullet : MonoBehaviour
     {
         transform.DOMove(target.transform.position, 0.5f).SetEase(Ease.Linear);
     }
-    public void SetObjectPool(ObjectPool<Bullet> pool)
-    {
-        _bulletPool = pool;
-    }
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.GetComponent<Enemy>() is not null)

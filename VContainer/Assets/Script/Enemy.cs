@@ -1,5 +1,4 @@
-
-using Assets.Script.Services;
+using System;
 using UnityEngine;
 using VContainer;
 public enum EnemyType
@@ -12,13 +11,12 @@ public enum EnemyType
 public class Enemy : MonoBehaviour
 {
     private Rigidbody2D _rigidbody;
-    private PlayerView _player;
-    private EnemyService _enemyService;
+    private PlayerPresenter _player;
     private int _attack;
     public int Attack => _attack;
     private float _speed;
     public float Speed => _speed;
-
+    public Action<Enemy> enemyDead;
     private float _healt;
     public float Healt
     {
@@ -28,7 +26,7 @@ public class Enemy : MonoBehaviour
             _healt = value;
             if (_healt <= 0)
             {
-                _enemyService.EnemyReturnToPool(this);
+                enemyDead?.Invoke(this);
             }
         }
     }
@@ -60,15 +58,14 @@ public class Enemy : MonoBehaviour
         }
     }
     [Inject]
-    private void Construct( PlayerView player, EnemyService service)
+    private void Construct( PlayerPresenter player  )
     {
         _player = player; 
-        _enemyService = service;
     }
     private void Awake()
     {
         _rigidbody = GetComponent<Rigidbody2D>();
-        int rnd = Random.Range(0, 3);
+        int rnd = UnityEngine.Random.Range(0, 3);
         _enemyType = (EnemyType)rnd;
     }
 
@@ -78,21 +75,13 @@ public class Enemy : MonoBehaviour
     }
     private void MoveTowardsPlayer()
     {
-        // Oyuncu ile düþman arasýndaki yön vektörünü hesapla
-        Vector2 direction = (_player.transform.position - transform.position).normalized;
-
-        // Hýz vektörünü hesapla
+        Vector2 direction = (_player.GetPosition() - transform.position).normalized;
         Vector2 velocity = direction * _speed;
-
-        // Rigidbody2D'nin hýzýný ayarla
         _rigidbody.velocity = velocity;
-
-        // Düþmanýn bakýþ yönünü ayarla
         SetLookDirection(direction);
     }
     private void SetLookDirection(Vector2 direction)
     {
-        // Düþmanýn yönünü oyuncuya çevir
         if (direction != Vector2.zero)
         {
             float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;

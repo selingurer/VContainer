@@ -1,76 +1,87 @@
 ﻿using Assets.Script.Services;
 using Cysharp.Threading.Tasks;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
-public class GameService : IStartable
+public class GameService : IStartable, IDisposable
 {
     private ILevelService _levelService;
-    private ObjectPool<Enemy> _enemyPool;
-    private ObjectPool<Experience> _experiencePool;
-    private PlayerView _player;
+    private PlayerPresenter _playerPresenter;
     private EnemyService _enemyService;
     private GameUIPanel _gameUIService;
     private ExperienceService _experienceService;
     private SkillService _skillService;
     [Inject]
-    private void Construct(ILevelService levelService, IObjectResolver resolver, PlayerView player, ObjectPool<Enemy> enemyPool,
-        ObjectPool<Experience> experiencePool, EnemyService enemyService, ExperienceService experienceService, GameUIPanel gameUIService,SkillService skillService)
+    private void Construct(ILevelService levelService, IObjectResolver resolver, PlayerPresenter player,
+         EnemyService enemyService, ExperienceService experienceService, GameUIPanel gameUIService, SkillService skillService)
     {
         _levelService = levelService;
-        _enemyPool = enemyPool;
-        _experiencePool = experiencePool;
         _enemyService = enemyService;
         _experienceService = experienceService;
         _gameUIService = gameUIService;
         _skillService = skillService;
-        _player = player;
+        _playerPresenter = player;
     }
 
     void IStartable.Start()
     {
         _levelService.SetLevel(1);
-        _enemyService._enemyPool = _enemyPool;
-        _enemyService.CreateEnemy();
-        _experienceService._experiencePool = _experiencePool;
-        _enemyService._experienceService = _experienceService;
-        _experienceService._gameService = this;
-        _player._gameService = this;
-        float playerHeartValue = _player.Healt;
-        _gameUIService.SliderHeartValueChanged((int)playerHeartValue, (int)playerHeartValue);
+        _enemyService.CreateEnemyAsync(_playerPresenter.GetPosition(),_levelService.GetInitialPoolSize()).Forget();
+        _playerPresenter.PlayerHealtChanged += async (heart) => await OnPlayerHealthChanged(heart);
+        _playerPresenter.PlayerDead += OnPlayerDead;
+        _playerPresenter.GetClosestEnemyAction += (pos) => OnGetClosestEnemy(pos);
+        _experienceService.ExperienceValueChanged += (experienceValue) => OnExperienceValueChangedAsync(experienceValue);
+        _enemyService.EnemyDead += (enemyPos) => OnEnemyDead(enemyPos);
+
+        _ = _gameUIService.SliderHeartValueChanged((int)_playerPresenter._dataPlayer.Health, (int)_playerPresenter._dataPlayer.FirstHealth);
     }
 
-    
-    public async void ExperienceValueChanged(int exValue)
+    private void OnGetClosestEnemy(Vector3 pos)
     {
-        int playerExperienceValue = _player.GetExperienceValue();
-        _player.SetExperienceValue(playerExperienceValue += exValue);
-        _ = _gameUIService.ExperienceValueChanged(_player.GetExperienceValue(), _levelService.GetExperienceTargetValue());
-        if (_player.GetExperienceValue() >= _levelService.GetExperienceTargetValue())
+        _playerPresenter.SetClosestEnemy(_enemyService.GetClosestEnemy(pos));
+    }
+
+    private void OnEnemyDead(Vector3 enemyPos)
+    {
+        _experienceService.GetExperience(enemyPos);
+    }
+
+    public async void OnExperienceValueChangedAsync(int exValue)
+    {
+        _playerPresenter._dataPlayer.ExperienceValue += exValue;
+        _playerPresenter._dataPlayer.TotalExperienceValue += exValue;
+        _ = _gameUIService.ExperienceValueChanged(_playerPresenter._dataPlayer.ExperienceValue, _levelService.GetExperienceTargetValue());
+        if (_playerPresenter._dataPlayer.ExperienceValue >= _levelService.GetExperienceTargetValue())
         {
-            _player.SetExperienceValue(0);
+            _playerPresenter._dataPlayer.ExperienceValue = 0;
             _levelService.SetLevel(_levelService.GetLevel() + 1);
             await _gameUIService.ExperienceValueChanged(0, _levelService.GetExperienceTargetValue());
-            _enemyService.CreateEnemy();
+            _enemyService.CreateEnemyAsync(_playerPresenter.GetPosition(), _levelService.GetInitialPoolSize()).Forget();
             await _gameUIService.LevelChanged(_levelService.GetLevel());
             _gameUIService.CreateSkill(_skillService.GetSkillList());
         }
     }
-    public void GameOver()
+    public void OnPlayerDead()
     {
         GameOverData data = new GameOverData()
         {
-            totalExperience = _player.GetTotalExperienceValue(),
+            totalExperience = _playerPresenter._dataPlayer.TotalExperienceValue,
             level = _levelService.GetLevel(),
         };
         _gameUIService.GameOver(data);
 
     }
-    public async UniTask PlayerHeartChanged()
+    public async UniTask OnPlayerHealthChanged(float heartValue)
     {
-        await _gameUIService.SliderHeartValueChanged((int)_player.Healt, (int)_player.FirstHealt);
+        await _gameUIService.SliderHeartValueChanged((int)heartValue, (int)_playerPresenter._dataPlayer.FirstHealth);
+    }
+    public void Dispose()
+    {
+        _playerPresenter.PlayerHealtChanged -= (heart) => _ = OnPlayerHealthChanged(heart);
+        _playerPresenter.PlayerDead -= OnPlayerDead;
     }
 }
 

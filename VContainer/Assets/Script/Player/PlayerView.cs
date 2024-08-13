@@ -37,8 +37,8 @@ public class PlayerView : MonoBehaviour
     {
         if (collision.GetComponent<Enemy>() != null)
         {
-
             TakeDamage?.Invoke(collision.GetComponent<Enemy>());
         }
     }
+
 }

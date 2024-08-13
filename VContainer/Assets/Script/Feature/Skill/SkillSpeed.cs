@@ -1,23 +1,11 @@
 using UnityEngine;
-using VContainer.Unity;
 
-public class SkillSpeed : Skill, IStartable
+public class SkillSpeed : ISkillSpeed
 {
-    private float _speedBoost = 1.3f;
-    
-    protected override void SetSkill()
-    {
-        base.SetSkill();
-        _player.SetSpeed(_player.Speed * _speedBoost);
-    }
+    public float SpeedBost { get =>1.3f; }
 
-    public void Start()
+    public void SetSkillSpeed(CharacterData data)
     {
-        Data = new SkillData
-        {
-            DescSkill = "Hýzýný %30 arttýrýr.",
-            SpriteSkill = Resources.Load<Sprite>("SpeedSkill")
-        };
-        
+        data.Speed *= SpeedBost; 
     }
 }
