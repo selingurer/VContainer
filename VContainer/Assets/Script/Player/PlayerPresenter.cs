@@ -7,21 +7,22 @@ using VContainer.Unity;
 public class PlayerPresenter : IPostFixedTickable, IStartable
 {
     private PlayerView _playerView;
-    private PlayerService _playerService;
     public ISkillSpeed _skillSpeed;
     public ISkillSheild _skillSheild;
     public ISkillHealth _skillHealth;
     public Action<Vector3> GetClosestEnemyAction;
     private bool IsDamage = true;
+    private PlayerData _playerData;
+
     public PlayerData _dataPlayer
     {
-        get => _playerService._playerData;
+        get => _playerData;
         set
         {
             if (_dataPlayer.Speed != value.Speed)
                 SetSpeed();
 
-            _playerService._playerData = value;
+            _playerData = value;
 
         }
     }
@@ -30,11 +31,10 @@ public class PlayerPresenter : IPostFixedTickable, IStartable
     public Action<float> PlayerHealtChanged;
 
     [Inject]
-    private void Construct(PlayerService playerService, PlayerView playerView,
+    private void Construct(PlayerView playerView,
         ISkillSpeed speedSkill, ISkillSheild skillSheild, ISkillHealth skillHealth)
     {
         _playerView = playerView;
-        _playerService = playerService;
         _skillSpeed = speedSkill;
         _skillSheild = skillSheild;
         _skillHealth = skillHealth;
@@ -43,19 +43,18 @@ public class PlayerPresenter : IPostFixedTickable, IStartable
     {
         _playerView.TakeDamage += (enemy) => { OnTakeDamage(enemy); };
         SetSpeed();
-        _playerService.PlayerDead += OnPlayerDead;
     }
     public Vector3 GetPosition() => _playerView.transform.position;
 
     public Transform GetTransform() => _playerView.transform;
 
-    private void OnPlayerDead() => PlayerDead?.Invoke();
-
     private void OnTakeDamage(Enemy enemy)
     {
         if (!_dataPlayer.Sheild)
         {
-            _playerService.Damage(enemy.Attack);
+            _playerData.Health -= enemy.Attack;
+            if (_playerData.Health < 0)
+                PlayerDead?.Invoke();
             PlayerHealtChanged?.Invoke(_dataPlayer.Health);
         }
     }
@@ -80,6 +79,12 @@ public class PlayerPresenter : IPostFixedTickable, IStartable
     }
     public void SetClosestEnemy(Enemy enemy)
     {
-        _playerService.Shoot(_playerView.transform.position, enemy);
+        if (enemy != null)
+        {
+            //var obj = _bulletPool.Get();
+            //obj.transform.position = _playerView.transform.position;
+            //obj.Target(enemy);
+            //obj._attackValue = _playerData.Attack;
+        }
     }
 }

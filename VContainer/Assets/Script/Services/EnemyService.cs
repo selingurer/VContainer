@@ -4,10 +4,11 @@ using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
 using VContainer;
+using VContainer.Unity;
 
 namespace Assets.Script.Services
 {
-    public class EnemyService : IDisposable
+    public class EnemyService : IDisposable, IStartable
     {
         public List<Enemy> _ActiveEnemyList = new List<Enemy>();
         [Inject] private ObjectPool<Enemy> _enemyPool;
@@ -15,10 +16,6 @@ namespace Assets.Script.Services
         public Action<Vector3> EnemyDead;
 
       
-        public EnemyService()
-        {
-            cancellationTokenSource = new CancellationTokenSource();
-        }
         public Enemy GetClosestEnemy(Vector3 origin)
         {
 
@@ -85,6 +82,11 @@ namespace Assets.Script.Services
                 cancellationTokenSource.Dispose();
                 cancellationTokenSource = null;
             }
+        }
+
+        public void Start()
+        {
+            cancellationTokenSource = new CancellationTokenSource();
         }
     }
 }
