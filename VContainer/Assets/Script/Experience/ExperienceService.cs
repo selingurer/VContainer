@@ -9,29 +9,33 @@ using VContainer.Unity;
 public class ExperienceService : IStartable, IDisposable
 {
     private int exValue;
-    [Inject] public ObjectPool<Experience> _experiencePool;
+    [Inject] private ObjectPool<ExperienceView> _experiencePool;
     public Action<int> ExperienceValueChanged;
     private CancellationTokenSource _cancellationTokenSource;
     public void GetExperience(Vector3 pos)
     {
         var obj = _experiencePool.Get();
         obj.transform.position = pos;
-        _ = DestroyExperience(obj);
+        obj.ExperienceClaim += OnExperienceClaim;
+        obj.ReturnToPoolExperienceAction += OnReturnToExperiencePool;
+        _ = ReturnToPoolAsync(obj);
     }
-    public void SetExperienceValue(int value)
+    private void OnExperienceClaim(int value)
     {
         exValue = value;
         ExperienceValueChanged?.Invoke(exValue);
     }
 
-    public void ReturnToExperiencePool(Experience experience)
+    private void OnReturnToExperiencePool(ExperienceView experience)
     {
         _experiencePool.ReturnToPool(experience);
+        experience.ExperienceClaim -= OnExperienceClaim;
+        experience.ReturnToPoolExperienceAction -= OnReturnToExperiencePool;
     }
-    private async UniTaskVoid DestroyExperience(Experience experience)
+    private async UniTask ReturnToPoolAsync(ExperienceView experience)
     {
         await UniTask.Delay(TimeSpan.FromSeconds(10));
-        if (experience != null) ReturnToExperiencePool(experience);
+        if (experience != null) OnReturnToExperiencePool(experience);
     }
     public void Start()
     {

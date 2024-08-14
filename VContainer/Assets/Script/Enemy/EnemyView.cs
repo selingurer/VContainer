@@ -8,23 +8,20 @@ public enum EnemyType
     Speed = 2,
 }
 
-public class Enemy : MonoBehaviour
+public class EnemyView : MonoBehaviour, ITargetable
 {
     private Rigidbody2D _rigidbody;
-    private PlayerPresenter _player;
-    private int _attack;
-    public int Attack => _attack;
+    private PlayerService _player;
+   
+    public int Attack { get; set; }
     private float _speed;
-    public float Speed => _speed;
-    public Action<Enemy> enemyDead;
-    private float _healt;
-    public float Healt
+    public Action<EnemyView> enemyDead;
+    public float Health
     {
-        get => _healt;
+        get => Health;
         set
         {
-            _healt = value;
-            if (_healt <= 0)
+            if (value <= 0)
             {
                 enemyDead?.Invoke(this);
             }
@@ -37,20 +34,20 @@ public class Enemy : MonoBehaviour
             switch (value)
             {
                 case EnemyType.Attack:
-                    _attack = 20;
-                    _healt = 100;
+                    Attack = 20;
+                    Health = 100;
                     this._speed = 2f;
                     gameObject.GetComponent<SpriteRenderer>().color = Color.green;
                     break;
                 case EnemyType.Heart:
-                    _healt = 110;
-                    _attack = 10;
+                    Health = 110;
+                    Attack = 10;
                     this._speed = 2f;
                     gameObject.GetComponent<SpriteRenderer>().color = Color.white;
                     break;
                 case EnemyType.Speed:
-                    _healt = 100;
-                    _attack = 10;
+                    Health = 100;
+                    Attack = 10;
                     this._speed = 3f;
                     gameObject.GetComponent<SpriteRenderer>().color = Color.red;
                     break;
@@ -58,9 +55,9 @@ public class Enemy : MonoBehaviour
         }
     }
     [Inject]
-    private void Construct( PlayerPresenter player  )
+    private void Construct(PlayerService player)
     {
-        _player = player; 
+        _player = player;
     }
     private void Awake()
     {
@@ -87,5 +84,10 @@ public class Enemy : MonoBehaviour
             float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
             _rigidbody.rotation = angle;
         }
+    }
+
+    public void TakeDamage(float damage)
+    {
+        Health -= damage;
     }
 }

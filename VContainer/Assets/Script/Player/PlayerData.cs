@@ -6,7 +6,7 @@ public class PlayerData : CharacterData
     public int ExperienceValue = 0;
     public int TotalExperienceValue = 0;
     public float FirstHealth = 200;
-    public bool Sheild = false;
+    public bool Shield = false;
 }
 
 public class CharacterData

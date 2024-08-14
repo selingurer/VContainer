@@ -1,7 +1,5 @@
 
-using UnityEngine;
-
-public class LevelService : ILevelService
+public class LevelService
 {
     private int _level;
     private int initialEnemyPoolSize = 15;

@@ -10,18 +10,16 @@ namespace Assets.Script.Services
 {
     public class EnemyService : IDisposable, IStartable
     {
-        public List<Enemy> _ActiveEnemyList = new List<Enemy>();
-        [Inject] private ObjectPool<Enemy> _enemyPool;
+        public List<EnemyView> _ActiveEnemyList = new List<EnemyView>();
+        [Inject] private ObjectPool<EnemyView> _enemyPool;
         private CancellationTokenSource cancellationTokenSource;
         public Action<Vector3> EnemyDead;
 
       
-        public Enemy GetClosestEnemy(Vector3 origin)
+        public EnemyView GetClosestEnemy(Vector3 origin)
         {
-
-            foreach (Enemy enemy in _ActiveEnemyList)
+            foreach (EnemyView enemy in _ActiveEnemyList)
             {
-
                 if (Vector3.Distance(enemy.transform.position, origin) < 5 && Vector3.Distance(enemy.transform.position, origin) > 2)
                 {
                     return enemy;
@@ -67,7 +65,7 @@ namespace Assets.Script.Services
                 };
                 }
         }
-        public void EnemyReturnToPool(Enemy enemy)
+        public void EnemyReturnToPool(EnemyView enemy)
         {
             EnemyDead?.Invoke(enemy.transform.position);
             _enemyPool.ReturnToPool(enemy);

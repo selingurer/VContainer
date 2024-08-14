@@ -1,13 +1,13 @@
 using System;
 using UnityEngine;
 
-public class PlayerView : MonoBehaviour
+public class PlayerView : MonoBehaviour,ITargetable
 {
     [SerializeField] private FixedJoystick _joystick;
     private Rigidbody2D _rigidbody;
     float _horizontal;
     float _vertical;
-    public Action<Enemy> TakeDamage;
+    public Action<float> TakeDamage;
     private float _speed;
     private void Awake()
     {
@@ -35,10 +35,14 @@ public class PlayerView : MonoBehaviour
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.GetComponent<Enemy>() != null)
+        if (collision.GetComponent<EnemyView>() != null)
         {
-            TakeDamage?.Invoke(collision.GetComponent<Enemy>());
+            TakeDamage?.Invoke(collision.GetComponent<EnemyView>().Attack);
         }
     }
 
+    void ITargetable.TakeDamage(float damage)
+    {
+        TakeDamage.Invoke(damage);
+    }
 }

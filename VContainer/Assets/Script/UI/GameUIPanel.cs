@@ -22,15 +22,15 @@ public class GameOverData
 public class GameUIPanel : MonoBehaviour
 {
     [SerializeField] private GameOverObj _gameOverObj;
-    [SerializeField] private Slider sliderExperience;
-    [SerializeField] private Text txtLevel;
-    [SerializeField] private Button btnContinue;
-    [SerializeField] private Slider sliderHeart;
-    [SerializeField] private Transform contentSkill;
+    [SerializeField] private Slider _sliderExperience;
+    [SerializeField] private Text _txtLevel;
+    [SerializeField] private Button _btnContinue;
+    [SerializeField] private Slider _sliderHeart;
+    [SerializeField] private Transform _contentSkill;
     [SerializeField] SkillCardUI _objectSkillCard;
 
     private SceneService _sceneService;
-    private List<SkillCardUI> _skillList = new List<SkillCardUI>();
+    private List<SkillCardUI> _skillCardList = new List<SkillCardUI>();
     [Inject]
     private void Construct(SceneService sceneService)
     {
@@ -38,11 +38,11 @@ public class GameUIPanel : MonoBehaviour
     }
     private void Awake()
     {
-        btnContinue.onClick.AddListener(BtnContinueClicked);
+        _btnContinue.onClick.AddListener(BtnContinueClicked);
     }
     private void OnDestroy()
     {
-        btnContinue.onClick.RemoveListener(BtnContinueClicked);
+        _btnContinue.onClick.RemoveListener(BtnContinueClicked);
     }
     private void BtnContinueClicked()
     {
@@ -50,22 +50,21 @@ public class GameUIPanel : MonoBehaviour
     }
     public async UniTask SliderHeartValueChanged(int heartValue, int maxValue)
     {
-        sliderHeart.maxValue = maxValue;
-        sliderHeart.DOValue(heartValue, 0.5f).SetEase(Ease.Linear).SetUpdate(true);
-
+        _sliderHeart.maxValue = maxValue;
+        _sliderHeart.DOValue(heartValue, 0.5f).SetEase(Ease.Linear).SetUpdate(true);
     }
     public async UniTask ExperienceValueChanged(int exValue, int maxValue)
     {
-        sliderExperience.maxValue = maxValue;
-        sliderExperience.DOValue(exValue, 0.5f).SetEase(Ease.Linear);
+        _sliderExperience.maxValue = maxValue;
+        _sliderExperience.DOValue(exValue, 0.5f).SetEase(Ease.Linear);
     }
     public async UniTask LevelChanged(int level)
     {
-        txtLevel.text = "Level" + " " + level;
-        txtLevel.gameObject.transform.DOScale(1, 0.5f).SetUpdate(true);
+        _txtLevel.text = "Level" + " " + level;
+        _txtLevel.gameObject.transform.DOScale(1, 0.5f).SetUpdate(true);
         Time.timeScale = 0f;
         await UniTask.Delay(TimeSpan.FromSeconds(1), ignoreTimeScale: true);
-        txtLevel.gameObject.transform.DOScale(0, 0.5f).SetUpdate(true);
+        _txtLevel.gameObject.transform.DOScale(0, 0.5f).SetUpdate(true);
     }
     public void GameOver(GameOverData data)
     {
@@ -75,24 +74,24 @@ public class GameUIPanel : MonoBehaviour
         _gameOverObj.txtLevel.text = data.level.ToString();
         _gameOverObj.txtTotalExperience.text = data.totalExperience.ToString();
     }
-    public void CreateSkill(List<SkillData> skillList)
+    public void CreateSkillCard(List<SkillData> skillList)
     {
-        contentSkill.parent.gameObject.SetActive(true);
+        _contentSkill.parent.gameObject.SetActive(true);
         foreach (var skill in skillList)
         {
-            var objectSkill = Instantiate(_objectSkillCard, contentSkill);
+            var objectSkill = Instantiate(_objectSkillCard, _contentSkill);
             objectSkill.SetSkillData(skill);
-            _skillList.Add(objectSkill);
+            _skillCardList.Add(objectSkill);
         }
     }
-    public void ClearSkill()
+    public void ClearSkillCard()
     {
-        foreach (var objSkill in _skillList)
+        foreach (var objSkill in _skillCardList)
         {
             Destroy(objSkill.gameObject);
 
         }
-        _skillList.Clear();
+        _skillCardList.Clear();
     }
 
 }

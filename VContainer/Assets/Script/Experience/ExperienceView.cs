@@ -1,21 +1,17 @@
-using Cysharp.Threading.Tasks;
 using DG.Tweening;
-using System.Collections;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Threading.Tasks;
+using System;
 using UnityEngine;
-using VContainer;
 
-public class Experience : MonoBehaviour
+public class ExperienceView : MonoBehaviour
 {
-    private ExperienceService _experienceService;
-
+    public Action<ExperienceView> ReturnToPoolExperienceAction;
+    public Action<int> ExperienceClaim;
+    private int _experienceValue = 10;
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.GetComponent<PlayerView>() != null)
         {
-            _experienceService.SetExperienceValue(10);
+            ExperienceClaim?.Invoke(_experienceValue);
             Sequence mySequence = DOTween.Sequence();
             this.GetComponent<BoxCollider2D>().enabled = false;
             mySequence.Append(this.gameObject.transform.DOScale(0.6f, 0.2f)).Append(this.gameObject.transform.DOMoveY(transform.position.y + 10, 0.5f))
@@ -24,16 +20,9 @@ public class Experience : MonoBehaviour
                     this.GetComponent<BoxCollider2D>().enabled = true;
                     this.GetComponent<SpriteRenderer>().DOFade(1, 0);
                     this.gameObject.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
-                    _experienceService.ReturnToExperiencePool(this);
+                    ReturnToPoolExperienceAction?.Invoke(this);
                 });
         }
-    }
-
-
-    [Inject]
-    private void Construct(ExperienceService service)
-    {
-        _experienceService = service;
     }
 
 }

@@ -4,22 +4,23 @@ using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
-public class PlayerPresenter : IPostFixedTickable, IStartable
+public class PlayerService : IPostFixedTickable, IStartable
 {
     private PlayerView _playerView;
     public ISkillSpeed _skillSpeed;
-    public ISkillSheild _skillSheild;
+    public ISkillShield _skillSheild;
     public ISkillHealth _skillHealth;
     public Action<Vector3> GetClosestEnemyAction;
     private bool IsDamage = true;
     private PlayerData _playerData;
+    private BulletSpawnerService _bulletSpawnerService;
 
     public PlayerData _dataPlayer
     {
         get => _playerData;
         set
         {
-            if (_dataPlayer.Speed != value.Speed)
+            if (_dataPlayer is not null && _dataPlayer.Speed != value.Speed)
                 SetSpeed();
 
             _playerData = value;
@@ -32,27 +33,29 @@ public class PlayerPresenter : IPostFixedTickable, IStartable
 
     [Inject]
     private void Construct(PlayerView playerView,
-        ISkillSpeed speedSkill, ISkillSheild skillSheild, ISkillHealth skillHealth)
+        ISkillSpeed speedSkill, ISkillShield skillSheild, ISkillHealth skillHealth,BulletSpawnerService bulletSpawnerService,PlayerData dataPlayer)
     {
         _playerView = playerView;
         _skillSpeed = speedSkill;
         _skillSheild = skillSheild;
         _skillHealth = skillHealth;
+        _bulletSpawnerService = bulletSpawnerService;
+        _dataPlayer = dataPlayer;
     }
     public void Start()
     {
-        _playerView.TakeDamage += (enemy) => { OnTakeDamage(enemy); };
+        _playerView.TakeDamage += (attackValue) => { OnTakeDamage(attackValue); };
         SetSpeed();
     }
     public Vector3 GetPosition() => _playerView.transform.position;
 
     public Transform GetTransform() => _playerView.transform;
 
-    private void OnTakeDamage(Enemy enemy)
+    private void OnTakeDamage(float attackValue)
     {
-        if (!_dataPlayer.Sheild)
+        if (!_dataPlayer.Shield)
         {
-            _playerData.Health -= enemy.Attack;
+            _playerData.Health -= attackValue;
             if (_playerData.Health < 0)
                 PlayerDead?.Invoke();
             PlayerHealtChanged?.Invoke(_dataPlayer.Health);
@@ -73,18 +76,15 @@ public class PlayerPresenter : IPostFixedTickable, IStartable
         await UniTask.Delay(1000);
         IsDamage = true;
     }
-    public void SetSpeed()
+    private void SetSpeed()
     {
         _playerView.SetSpeed(_dataPlayer.Speed);
     }
-    public void SetClosestEnemy(Enemy enemy)
+    public void SetClosestEnemy(EnemyView enemy)
     {
         if (enemy != null)
         {
-            //var obj = _bulletPool.Get();
-            //obj.transform.position = _playerView.transform.position;
-            //obj.Target(enemy);
-            //obj._attackValue = _playerData.Attack;
+            _bulletSpawnerService.GetBullet(enemy,_playerView,_playerView.transform.position,_dataPlayer.Attack);
         }
     }
 }

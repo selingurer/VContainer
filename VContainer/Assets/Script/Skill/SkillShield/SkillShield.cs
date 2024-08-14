@@ -4,7 +4,7 @@ using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
-public class SkillSheild : ISkillSheild
+public class SkillShield : ISkillShield
 {
     IObjectResolver _resolver;
     GameObject _skillSheildObject;
@@ -16,13 +16,13 @@ public class SkillSheild : ISkillSheild
         _skillSheildObject = skillSheildObj;
     }
 
-    public async UniTask SetSkillSheild(PlayerData dataPlayer, Transform transform)
+    public async UniTask SetSkillShield(PlayerData dataPlayer, Transform transform)
     {
-        dataPlayer.Sheild = true;
+        dataPlayer.Shield = true;
         var objectSkill = _resolver.Instantiate(_skillSheildObject);
         objectSkill.transform.SetParent(transform, false);
         await UniTask.Delay(10000);
         objectSkill.gameObject.SetActive(false);
-        dataPlayer.Sheild = false;
+        dataPlayer.Shield = false;
     }
 }

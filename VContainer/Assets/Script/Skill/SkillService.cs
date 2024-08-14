@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -7,8 +8,8 @@ public class SkillService : IStartable
 {
     public List<SkillData> _skillList { get; set; }
 
-    [Inject] PlayerPresenter _playerPresenter;
-
+    [Inject] PlayerService _playerPresenter;
+    public Action SelectSkillAction;
     public List<SkillData> GetSkillList()
     {
 
@@ -23,7 +24,7 @@ public class SkillService : IStartable
 
         while (selectedIndices.Count < 3)
         {
-            int randomIndex = Random.Range(0, _skillList.Count);
+            int randomIndex = UnityEngine.Random.Range(0, _skillList.Count);
             selectedIndices.Add(randomIndex);
         }
 
@@ -35,7 +36,7 @@ public class SkillService : IStartable
         return selectedSkills;
 
     }
-    public void AddSkill()
+    private void AddSkill()
     {
         _skillList.AddRange(new List<SkillData>
         {
@@ -43,8 +44,8 @@ public class SkillService : IStartable
             {
                SkillAction  = async () =>
                {
-                   Time.timeScale = 1;
-                  await _playerPresenter._skillSheild.SetSkillSheild(_playerPresenter._dataPlayer,_playerPresenter.GetTransform());
+                   SelectedSkill();
+                  await _playerPresenter._skillSheild.SetSkillShield(_playerPresenter._dataPlayer,_playerPresenter.GetTransform());
                },
                SkillType = SkillTypes.Shield,
                DescSkill = "Koruma Kalkanı sağlar. 10 saniye boyunca hasar almazsın.",
@@ -54,8 +55,8 @@ public class SkillService : IStartable
             {
                  SkillAction = () =>
                  {
+                  SelectedSkill();
                   _playerPresenter._skillHealth.SetSkillHealth(_playerPresenter._dataPlayer);
-                   Time.timeScale = 1;
                  },
                SkillType = SkillTypes.Heart,
                DescSkill = "Can hasarını %100 iyileştirir.",
@@ -66,7 +67,7 @@ public class SkillService : IStartable
             {
                SkillAction = () =>
                  {
-                   Time.timeScale = 1;
+                   SelectedSkill();
                    _playerPresenter._skillSpeed.SetSkillSpeed(_playerPresenter._dataPlayer);
                  },
                SkillType = SkillTypes.Speed,
@@ -77,10 +78,10 @@ public class SkillService : IStartable
     }
 
 
-    public void SelectedSkill(SkillData skill)
+    private void SelectedSkill()
     {
-        _skillList.Remove(skill);
-        skill.SkillAction();
+        SelectSkillAction?.Invoke();
+        Time.timeScale = 1;
     }
 
     public void Start()
