@@ -2147,11 +2147,11 @@ MonoBehaviour:
     txtLevel: {fileID: 1961590567}
     txtTotalExperience: {fileID: 961663821}
     objGameOverPanel: {fileID: 665407816}
-  sliderExperience: {fileID: 2070135706}
-  txtLevel: {fileID: 1686777620}
-  btnContinue: {fileID: 1784770590}
-  sliderHeart: {fileID: 2020287229}
-  contentSkill: {fileID: 1610942438}
+  _sliderExperience: {fileID: 2070135706}
+  _txtLevel: {fileID: 1686777620}
+  _btnContinue: {fileID: 1784770590}
+  _sliderHeart: {fileID: 2020287229}
+  _contentSkill: {fileID: 1610942438}
   _objectSkillCard: {fileID: 7739459063204595473, guid: b592e56c842cabb4b90c0780c9683a44, type: 3}
 --- !u!222 &1925402902
 CanvasRenderer:

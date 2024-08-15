@@ -11,16 +11,18 @@ public enum EnemyType
 public class EnemyView : MonoBehaviour, ITargetable
 {
     private Rigidbody2D _rigidbody;
-    private PlayerService _player;
+    private PlayerView _player;
    
     public int Attack { get; set; }
     private float _speed;
     public Action<EnemyView> enemyDead;
+    private float health;
     public float Health
     {
-        get => Health;
+        get => health;
         set
         {
+            health = value;
             if (value <= 0)
             {
                 enemyDead?.Invoke(this);
@@ -55,7 +57,7 @@ public class EnemyView : MonoBehaviour, ITargetable
         }
     }
     [Inject]
-    private void Construct(PlayerService player)
+    private void Construct(PlayerView player)
     {
         _player = player;
     }
@@ -72,7 +74,7 @@ public class EnemyView : MonoBehaviour, ITargetable
     }
     private void MoveTowardsPlayer()
     {
-        Vector2 direction = (_player.GetPosition() - transform.position).normalized;
+        Vector2 direction = (_player.transform.position - transform.position).normalized;
         Vector2 velocity = direction * _speed;
         _rigidbody.velocity = velocity;
         SetLookDirection(direction);

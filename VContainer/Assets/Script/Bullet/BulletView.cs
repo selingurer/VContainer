@@ -26,7 +26,7 @@ public class BulletView : MonoBehaviour
         if (target != null)
         {
             target.TakeDamage(_attackValue);
-            ReturnToPoolBulletAction.Invoke(this);
+            ReturnToPoolBulletAction?.Invoke(this);
         }
     }
 }
