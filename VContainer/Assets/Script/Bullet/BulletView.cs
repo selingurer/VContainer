@@ -1,7 +1,6 @@
 using DG.Tweening;
 using System;
 using UnityEngine;
-using VContainer;
 
 public class BulletView : MonoBehaviour
 {

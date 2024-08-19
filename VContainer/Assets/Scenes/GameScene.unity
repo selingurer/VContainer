@@ -2508,6 +2508,10 @@ PrefabInstance:
       value: GameSceneLifetimeScope
       objectReference: {fileID: 0}
     - target: {fileID: 1463004499136810113, guid: dce689a2458eada4d8c8ef57d686330d, type: 3}
+      propertyPath: gameData
+      value: 
+      objectReference: {fileID: 11400000, guid: 10e85bfb1b482b048bbc9739f9402dda, type: 2}
+    - target: {fileID: 1463004499136810113, guid: dce689a2458eada4d8c8ef57d686330d, type: 3}
       propertyPath: joystick
       value: 
       objectReference: {fileID: 1528205619}

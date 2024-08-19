@@ -11,26 +11,34 @@ namespace Assets.Script.Services
     public class EnemyService : IDisposable, IStartable
     {
         public List<EnemyView> _ActiveEnemyList = new List<EnemyView>();
-         private ObjectPool<EnemyView> _enemyPool;
+        private ObjectPool<EnemyView> _enemyPool;
         private CancellationTokenSource cancellationTokenSource;
         public Action<Vector3> EnemyDead;
-
         [Inject]
-        private void Construct (ObjectPool<EnemyView> objectPoolEnemy)
+        private void Construct(ObjectPool<EnemyView> objectPoolEnemy)
         {
             _enemyPool = objectPoolEnemy;
-
         }
         public EnemyView GetClosestEnemy(Vector3 origin)
         {
+            EnemyView closestEnemy = null;
+            float closestDistance = Mathf.Infinity;
+
             foreach (EnemyView enemy in _ActiveEnemyList)
             {
-                if (Vector3.Distance(enemy.transform.position, origin) < 5 && Vector3.Distance(enemy.transform.position, origin) > 2)
+                float distanceToEnemy = Vector3.Distance(enemy.transform.position, origin);
+
+                if (distanceToEnemy < 5f && distanceToEnemy > 2f)
                 {
-                    return enemy;
+                    if (distanceToEnemy < closestDistance)
+                    {
+                        closestDistance = distanceToEnemy;
+                        closestEnemy = enemy;
+                    }
                 }
             }
-            return null;
+
+            return closestEnemy;
         }
         public async UniTask CreateEnemyAsync(Vector3 playerPos, int initialPoolSize)
         {
@@ -68,7 +76,7 @@ namespace Assets.Script.Services
                     EnemyReturnToPool(enemy);
                     obj.enemyDead -= (enemy) => EnemyReturnToPool(enemy);
                 };
-                }
+            }
         }
         public void EnemyReturnToPool(EnemyView enemy)
         {
