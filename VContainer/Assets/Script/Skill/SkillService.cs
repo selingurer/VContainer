@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -45,7 +46,8 @@ public class SkillService : IStartable
                SkillAction  = async () =>
                {
                    SelectedSkill();
-                  await _playerPresenter._skillSheild.SetSkillShield(_playerPresenter._dataPlayer,_playerPresenter.GetTransform());
+                   CancellationToken cancellationToken = new CancellationToken();
+                  await _playerPresenter._skillSheild.SetSkillShield(_playerPresenter._dataPlayer,_playerPresenter.GetTransform(),cancellationToken);
                },
                SkillType = SkillTypes.Shield,
                DescSkill = "Koruma Kalkanı sağlar. 10 saniye boyunca hasar almazsın.",

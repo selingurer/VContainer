@@ -1,7 +1,6 @@
 
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using VContainer;
 public enum SceneType
 {
     MainScene = 0,

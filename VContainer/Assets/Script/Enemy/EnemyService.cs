@@ -11,11 +11,16 @@ namespace Assets.Script.Services
     public class EnemyService : IDisposable, IStartable
     {
         public List<EnemyView> _ActiveEnemyList = new List<EnemyView>();
-        [Inject] private ObjectPool<EnemyView> _enemyPool;
+         private ObjectPool<EnemyView> _enemyPool;
         private CancellationTokenSource cancellationTokenSource;
         public Action<Vector3> EnemyDead;
 
-      
+        [Inject]
+        private void Construct (ObjectPool<EnemyView> objectPoolEnemy)
+        {
+            _enemyPool = objectPoolEnemy;
+
+        }
         public EnemyView GetClosestEnemy(Vector3 origin)
         {
             foreach (EnemyView enemy in _ActiveEnemyList)

@@ -76,7 +76,14 @@ public class GameService : IStartable, IDisposable
             level = _levelService.GetLevel(),
         };
         _gameUIPanel.GameOver(data);
+        ResetToData();
 
+
+    }
+    private void ResetToData()
+    {
+        _playerService._dataPlayer.ResetToData();
+        _playerService._dataPlayer.ResetToPlayerData();
     }
     public async UniTask OnPlayerHealthChanged(float heartValue)
     {

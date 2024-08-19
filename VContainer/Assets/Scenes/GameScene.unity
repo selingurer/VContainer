@@ -2508,9 +2508,17 @@ PrefabInstance:
       value: GameSceneLifetimeScope
       objectReference: {fileID: 0}
     - target: {fileID: 1463004499136810113, guid: dce689a2458eada4d8c8ef57d686330d, type: 3}
+      propertyPath: joystick
+      value: 
+      objectReference: {fileID: 1528205619}
+    - target: {fileID: 1463004499136810113, guid: dce689a2458eada4d8c8ef57d686330d, type: 3}
       propertyPath: UIService
       value: 
       objectReference: {fileID: 1925402901}
+    - target: {fileID: 1463004499136810113, guid: dce689a2458eada4d8c8ef57d686330d, type: 3}
+      propertyPath: enemyData
+      value: 
+      objectReference: {fileID: 11400000, guid: 12e3e0ae7b7a4ac40a5ff6e8d71df79c, type: 2}
     - target: {fileID: 1463004499136810113, guid: dce689a2458eada4d8c8ef57d686330d, type: 3}
       propertyPath: objBullet
       value: 
@@ -2526,7 +2534,7 @@ PrefabInstance:
     - target: {fileID: 1463004499136810113, guid: dce689a2458eada4d8c8ef57d686330d, type: 3}
       propertyPath: playerData
       value: 
-      objectReference: {fileID: 11400000, guid: d31ce5ee91d2d8a4592aa14279c9d970, type: 2}
+      objectReference: {fileID: 11400000, guid: c8b19026869e20643991a166ccb9fadb, type: 2}
     - target: {fileID: 1463004499136810113, guid: dce689a2458eada4d8c8ef57d686330d, type: 3}
       propertyPath: gameUIPanel
       value: 

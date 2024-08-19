@@ -12,23 +12,9 @@ public class EnemyView : MonoBehaviour, ITargetable
 {
     private Rigidbody2D _rigidbody;
     private PlayerView _player;
-   
-    public int Attack { get; set; }
-    private float _speed;
+    [Inject] private EnemyData _enemyData;
     public Action<EnemyView> enemyDead;
-    private float health;
-    public float Health
-    {
-        get => health;
-        set
-        {
-            health = value;
-            if (value <= 0)
-            {
-                enemyDead?.Invoke(this);
-            }
-        }
-    }
+
     private EnemyType _enemyType
     {
         set
@@ -36,21 +22,21 @@ public class EnemyView : MonoBehaviour, ITargetable
             switch (value)
             {
                 case EnemyType.Attack:
-                    Attack = 20;
-                    Health = 100;
-                    this._speed = 2f;
+                    _enemyData.Attack = 20;
+                    _enemyData.Health = 100;
+                    _enemyData.Speed = 2f;
                     gameObject.GetComponent<SpriteRenderer>().color = Color.green;
                     break;
                 case EnemyType.Heart:
-                    Health = 110;
-                    Attack = 10;
-                    this._speed = 2f;
+                    _enemyData.Health = 110;
+                    _enemyData.Attack = 10;
+                    _enemyData.Speed = 2f;
                     gameObject.GetComponent<SpriteRenderer>().color = Color.white;
                     break;
                 case EnemyType.Speed:
-                    Health = 100;
-                    Attack = 10;
-                    this._speed = 3f;
+                    _enemyData.Health = 100;
+                    _enemyData.Attack = 10;
+                    _enemyData.Speed = 3f;
                     gameObject.GetComponent<SpriteRenderer>().color = Color.red;
                     break;
             }
@@ -75,7 +61,7 @@ public class EnemyView : MonoBehaviour, ITargetable
     private void MoveTowardsPlayer()
     {
         Vector2 direction = (_player.transform.position - transform.position).normalized;
-        Vector2 velocity = direction * _speed;
+        Vector2 velocity = direction * _enemyData.Speed;
         _rigidbody.velocity = velocity;
         SetLookDirection(direction);
     }
@@ -90,6 +76,15 @@ public class EnemyView : MonoBehaviour, ITargetable
 
     public void TakeDamage(float damage)
     {
-        Health -= damage;
+        _enemyData.Health -= damage;
+        if(_enemyData.Health <= 0)
+        {
+            enemyDead?.Invoke(this);
+        }
+    }
+
+    public float GetAttackValue()
+    {
+       return _enemyData.Attack;
     }
 }

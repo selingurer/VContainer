@@ -1,14 +1,21 @@
 using System;
 using UnityEngine;
+using VContainer;
 
-public class PlayerView : MonoBehaviour,ITargetable
+public class PlayerView : MonoBehaviour, ITargetable
 {
-    [SerializeField] private FixedJoystick _joystick;
+    private IInputProvider _inputProvider;
     private Rigidbody2D _rigidbody;
-    float _horizontal;
-    float _vertical;
     public Action<float> TakeDamage;
-    private float _speed;
+    private PlayerData _playerData;
+
+    [Inject]
+    private void Construct(IInputProvider inputProvider, PlayerData playerData)
+    {
+        _inputProvider = inputProvider;
+        _playerData = playerData;
+    }
+
     private void Awake()
     {
         _rigidbody = GetComponent<Rigidbody2D>();
@@ -16,33 +23,35 @@ public class PlayerView : MonoBehaviour,ITargetable
 
     void FixedUpdate()
     {
-        GetMovementInput();
-        SetMovement();
+        if (_playerData != null)
+        {
+            SetMovement();
+        }
     }
     private void SetMovement()
     {
-        _rigidbody.velocity = new Vector2(_horizontal, _vertical) * _speed;
+        var horizontal = _inputProvider.Horizontal;
+        var vertical = _inputProvider.Vertical;
+        _rigidbody.velocity = new Vector2(horizontal, vertical) * _playerData.Speed;
     }
 
-    private void GetMovementInput()
-    {
-        _horizontal = _joystick.Horizontal;
-        _vertical = _joystick.Vertical;
-    }
-    public void SetSpeed(float speed)
-    {
-        _speed = speed;
-    }
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.GetComponent<EnemyView>() != null)
+        var targetable = collision.GetComponent<ITargetable>();
+        if (targetable != null)
         {
-            TakeDamage?.Invoke(collision.GetComponent<EnemyView>().Attack);
+            float attackValue = targetable.GetAttackValue();
+            TakeDamage?.Invoke(attackValue);
         }
     }
 
     void ITargetable.TakeDamage(float damage)
     {
         TakeDamage.Invoke(damage);
+    }
+
+    public float GetAttackValue()
+    {
+        return _playerData.Attack;
     }
 }

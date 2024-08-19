@@ -14,22 +14,29 @@ public class GameSceneLifetimeScope : LifetimeScope
     [SerializeField] private SkillCardUI objSkillCardUI;
     [SerializeField] private GameObject objSheildSkill;
     [SerializeField] private SkillData skillData;
+    [SerializeField] private PlayerData playerData;
+    [SerializeField] private FixedJoystick joystick;
     protected override void Configure(IContainerBuilder builder)
     {
+        builder.Register<JoystickInput>(Lifetime.Singleton)
+        .As<IInputProvider>()
+        .WithParameter(joystick);
         builder.Register<LevelService>(Lifetime.Singleton).AsSelf();
         builder.RegisterInstance(objBullet);
         builder.RegisterInstance(gameUIPanel);
         builder.RegisterInstance(objSkillCardUI);
-        builder.RegisterInstance(objPlayer).WithParameter(objBullet);
-        builder.Register<EnemyView>(Lifetime.Transient).WithParameter(objPlayer);
-
+        builder.RegisterInstance(playerData);
+        builder.RegisterInstance(objPlayer).WithParameter(playerData);
+        builder.Register<EnemyData>(Lifetime.Transient);
+        builder.Register<EnemyView>(Lifetime.Transient).WithParameter(new EnemyData());
         //Skill
         builder.Register<SkillHealth>(Lifetime.Transient).AsImplementedInterfaces();
         builder.Register<SkillSpeed>(Lifetime.Transient).AsImplementedInterfaces();
         builder.Register<SkillShield>(Lifetime.Transient).AsImplementedInterfaces().WithParameter(objSheildSkill);
 
         //Player
-        builder.Register<PlayerService>(Lifetime.Singleton).AsSelf().AsImplementedInterfaces().WithParameter(new PlayerData());
+       
+        builder.Register<PlayerService>(Lifetime.Singleton).AsSelf().AsImplementedInterfaces().WithParameter(playerData);
 
         builder.Register<ObjectPool<EnemyView>>(Lifetime.Singleton).WithParameter(objEnemyPrefab).WithParameter(20);
         builder.Register<ObjectPool<BulletView>>(Lifetime.Singleton).WithParameter(objBullet).WithParameter(20);

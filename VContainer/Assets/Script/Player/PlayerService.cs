@@ -20,11 +20,7 @@ public class PlayerService : IPostFixedTickable, IStartable
         get => _playerData;
         set
         {
-            if (_dataPlayer is not null && _dataPlayer.Speed != value.Speed)
-                SetSpeed();
-
             _playerData = value;
-
         }
     }
 
@@ -45,7 +41,6 @@ public class PlayerService : IPostFixedTickable, IStartable
     public void Start()
     {
         _playerView.TakeDamage += (attackValue) => { OnTakeDamage(attackValue); };
-        SetSpeed();
     }
     public Vector3 GetPosition() => _playerView.transform.position;
 
@@ -75,10 +70,6 @@ public class PlayerService : IPostFixedTickable, IStartable
         IsDamage = false;
         await UniTask.Delay(1000);
         IsDamage = true;
-    }
-    private void SetSpeed()
-    {
-        _playerView.SetSpeed(_dataPlayer.Speed);
     }
     public void SetClosestEnemy(EnemyView enemy)
     {
