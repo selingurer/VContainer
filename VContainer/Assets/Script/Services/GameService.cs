@@ -1,26 +1,32 @@
 ﻿using Assets.Script.Services;
 using Cysharp.Threading.Tasks;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
-
+public static class GameEvents
+{
+    public static Action<float, float> OnPlayerHealthChanged;
+    public static Action<int, int> OnExperienceChanged;
+    public static Action<int,List<SkillData>> OnLevelUp;
+    public static Action<GameOverData> OnGameOver;
+    public static Action OnSkillSelected;
+}
 public class GameService : IStartable, IDisposable
 {
     private LevelService _levelService;
     private PlayerService _playerService;
     private EnemyService _enemyService;
-    private GameUIPanel _gameUIPanel;
     private ExperienceService _experienceService;
     private SkillService _skillService;
     [Inject]
-    private void Construct(LevelService levelService, IObjectResolver resolver, PlayerService player,
-         EnemyService enemyService, ExperienceService experienceService, GameUIPanel gameUIService, SkillService skillService)
+    private void Construct(LevelService levelService, PlayerService player,
+         EnemyService enemyService, ExperienceService experienceService , SkillService skillService)
     {
         _levelService = levelService;
         _enemyService = enemyService;
         _experienceService = experienceService;
-        _gameUIPanel = gameUIService;
         _skillService = skillService;
         _playerService = player;
     }
@@ -35,12 +41,12 @@ public class GameService : IStartable, IDisposable
         _experienceService.ExperienceValueChanged += (experienceValue) => OnExperienceValueChangedAsync(experienceValue);
         _enemyService.EnemyDead += (enemyPos) => OnEnemyDead(enemyPos);
         _skillService.SelectSkillAction += OnSelectSkillCard;
-        _gameUIPanel.SliderHeartValueChanged((int)_playerService._dataPlayer.Health, (int)_playerService._dataPlayer.FirstHealth).Forget();
+        GameEvents.OnExperienceChanged?.Invoke(_playerService._dataPlayer.ExperienceValue, _levelService.GetExperienceTargetValue());
     }
 
     private void OnSelectSkillCard()
     {
-       _gameUIPanel.ClearSkillCard();
+        GameEvents.OnSkillSelected?.Invoke();
     }
 
     private void OnGetClosestEnemy(Vector3 pos)
@@ -57,15 +63,15 @@ public class GameService : IStartable, IDisposable
     {
         _playerService._dataPlayer.ExperienceValue += exValue;
         _playerService._dataPlayer.TotalExperienceValue += exValue;
-        _ = _gameUIPanel.ExperienceValueChanged(_playerService._dataPlayer.ExperienceValue, _levelService.GetExperienceTargetValue());
+        GameEvents.OnExperienceChanged?.Invoke(_playerService._dataPlayer.ExperienceValue, _levelService.GetExperienceTargetValue());
         if (_playerService._dataPlayer.ExperienceValue >= _levelService.GetExperienceTargetValue())
         {
             _playerService._dataPlayer.ExperienceValue = 0;
             _levelService.SetLevel(_levelService.GetLevel() + 1);
-            await _gameUIPanel.ExperienceValueChanged(0, _levelService.GetExperienceTargetValue());
+            GameEvents.OnLevelUp?.Invoke(_levelService.GetLevel(), _skillService.GetSkillList());
+            GameEvents.OnExperienceChanged?.Invoke(_playerService._dataPlayer.ExperienceValue, _levelService.GetExperienceTargetValue());
             _enemyService.CreateEnemyAsync(_playerService.GetPosition(), _levelService.GetInitialPoolSize()).Forget();
-            await _gameUIPanel.LevelChanged(_levelService.GetLevel());
-            _gameUIPanel.CreateSkillCard(_skillService.GetSkillList());
+          
         }
     }
     public void OnPlayerDead()
@@ -75,7 +81,7 @@ public class GameService : IStartable, IDisposable
             totalExperience = _playerService._dataPlayer.TotalExperienceValue,
             level = _levelService.GetLevel(),
         };
-        _gameUIPanel.GameOver(data);
+        GameEvents.OnGameOver?.Invoke(data);
         ResetToData();
 
 
@@ -87,7 +93,7 @@ public class GameService : IStartable, IDisposable
     }
     public async UniTask OnPlayerHealthChanged(float heartValue)
     {
-        await _gameUIPanel.SliderHeartValueChanged((int)heartValue, (int)_playerService._dataPlayer.FirstHealth);
+        GameEvents.OnPlayerHealthChanged?.Invoke(heartValue, _playerService._dataPlayer.FirstHealth);
     }
     public void Dispose()
     {

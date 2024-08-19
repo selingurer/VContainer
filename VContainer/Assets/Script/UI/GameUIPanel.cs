@@ -60,9 +60,9 @@ public class GameUIPanel : MonoBehaviour
     }
     public async UniTask LevelChanged(int level)
     {
+        Time.timeScale = 0f;
         _txtLevel.text = "Level" + " " + level;
         _txtLevel.gameObject.transform.DOScale(1, 0.5f).SetUpdate(true);
-        Time.timeScale = 0f;
         await UniTask.Delay(TimeSpan.FromSeconds(1), ignoreTimeScale: true);
         _txtLevel.gameObject.transform.DOScale(0, 0.5f).SetUpdate(true);
     }

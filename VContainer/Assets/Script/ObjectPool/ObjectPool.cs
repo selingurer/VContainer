@@ -55,14 +55,14 @@ public class ObjectPool<T> where T : Component
     private void ShrinkPool()
     {
 
-        while (_objectList.Count > _maxPoolSize)
-        {
-            var objectToRemove = _objectList[_objectList.Count - 1];
-            if (objectToRemove != null)
-            {
-                _objectList.Remove(objectToRemove);
-                Object.Destroy(objectToRemove.gameObject);
-            }
-        }
+        //while (_objectList.Count > _maxPoolSize)
+        //{
+        //    var objectToRemove = _objectList[_objectList.Count - 1];
+        //    if (objectToRemove != null)
+        //    {
+        //        _objectList.Remove(objectToRemove);
+        //        Object.Destroy(objectToRemove.gameObject);
+        //    }
+        //}
     }
 }

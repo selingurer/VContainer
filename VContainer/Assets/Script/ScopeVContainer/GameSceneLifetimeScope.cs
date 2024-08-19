@@ -1,4 +1,5 @@
 using Assets.Script.Services;
+using System.ComponentModel;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -37,7 +38,6 @@ public class GameSceneLifetimeScope : LifetimeScope
         builder.Register<SkillShield>(Lifetime.Transient).AsImplementedInterfaces().WithParameter(objSheildSkill);
 
         //Player
-       
         builder.Register<PlayerService>(Lifetime.Singleton).AsSelf().AsImplementedInterfaces().WithParameter(playerData);
 
         builder.Register<ObjectPool<EnemyView>>(Lifetime.Singleton).WithParameter(objEnemyPrefab).WithParameter(15).WithParameter(gameData);
@@ -48,9 +48,9 @@ public class GameSceneLifetimeScope : LifetimeScope
         builder.Register<EnemyService>(Lifetime.Singleton).AsSelf().AsImplementedInterfaces();
         builder.Register<ExperienceView>(Lifetime.Transient);
         builder.Register<SkillService>(Lifetime.Singleton).AsSelf().AsImplementedInterfaces().WithParameter(skillData);
+        builder.Register<UIService>(Lifetime.Singleton).AsSelf().AsImplementedInterfaces().WithParameter(gameUIPanel);
         builder.Register<GameService>(Lifetime.Singleton).AsImplementedInterfaces()
             .WithParameter(objEnemyPrefab)
-            .WithParameter(transformEnemy)
-            .WithParameter(objPlayer).WithParameter(gameUIPanel);
+            .WithParameter(objPlayer);
     }
 }
