@@ -44,7 +44,7 @@ public class GameSceneLifetimeScope : LifetimeScope
         builder.Register<ObjectPool<EnemyView>>(Lifetime.Singleton).WithParameter(objEnemyPrefab).WithParameter(15).WithParameter(gameData);
         builder.Register<ObjectPool<BulletView>>(Lifetime.Singleton).WithParameter(objBullet).WithParameter(15).WithParameter(gameData);
         builder.Register<ObjectPool<ExperienceView>>(Lifetime.Singleton).WithParameter(objExperience).WithParameter(15).WithParameter(gameData);
-        builder.Register<BulletSpawnerService>(Lifetime.Singleton).AsSelf();
+        builder.Register<BulletSpawnerService>(Lifetime.Singleton).AsSelf().AsImplementedInterfaces();
         builder.Register<ExperienceService>(Lifetime.Singleton).AsSelf();
         builder.Register<EnemyService>(Lifetime.Singleton).AsSelf().AsImplementedInterfaces();
         builder.Register<ExperienceView>(Lifetime.Transient);

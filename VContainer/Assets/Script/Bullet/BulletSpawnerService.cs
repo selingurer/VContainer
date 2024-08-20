@@ -1,7 +1,7 @@
 using UnityEngine;
 using VContainer;
 
-public class BulletSpawnerService
+public class BulletSpawnerService : IBulletSpawnerService
 {
     [Inject] private ObjectPool<BulletView> _bulletPool;
 

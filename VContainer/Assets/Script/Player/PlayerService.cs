@@ -14,7 +14,7 @@ public class PlayerService : IPostFixedTickable, IStartable
     private IClosestTargetLocator<EnemyView> _closestTargetLocator;
     private bool IsDamage = true;
     private PlayerData _playerData;
-    private BulletSpawnerService _bulletSpawnerService;
+    private IBulletSpawnerService _bulletSpawnerService;
     private IEnemyService _enemyService;
     public PlayerData _dataPlayer
     {
@@ -30,7 +30,7 @@ public class PlayerService : IPostFixedTickable, IStartable
 
     [Inject]
     private void Construct(PlayerView playerView, ISkillSpeed speedSkill, ISkillShield skillSheild, ISkillHealth skillHealth,
-        BulletSpawnerService bulletSpawnerService, PlayerData dataPlayer, IClosestTargetLocator<EnemyView> closeTargetLocator,
+        IBulletSpawnerService bulletSpawnerService, PlayerData dataPlayer, IClosestTargetLocator<EnemyView> closeTargetLocator,
         IEnemyService enemyService)
     {
         _playerView = playerView;
