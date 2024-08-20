@@ -1,3 +1,4 @@
+using Assets.Script.Services;
 using Cysharp.Threading.Tasks;
 using System;
 using UnityEngine;
@@ -10,11 +11,11 @@ public class PlayerService : IPostFixedTickable, IStartable
     public ISkillSpeed _skillSpeed;
     public ISkillShield _skillSheild;
     public ISkillHealth _skillHealth;
-    public Action<Vector3> GetClosestEnemyAction;
+    private IClosestTargetLocator<EnemyView> _closestTargetLocator;
     private bool IsDamage = true;
     private PlayerData _playerData;
     private BulletSpawnerService _bulletSpawnerService;
-
+    private IEnemyService _enemyService;
     public PlayerData _dataPlayer
     {
         get => _playerData;
@@ -28,8 +29,9 @@ public class PlayerService : IPostFixedTickable, IStartable
     public Action<float> PlayerHealtChanged;
 
     [Inject]
-    private void Construct(PlayerView playerView,
-        ISkillSpeed speedSkill, ISkillShield skillSheild, ISkillHealth skillHealth,BulletSpawnerService bulletSpawnerService,PlayerData dataPlayer)
+    private void Construct(PlayerView playerView, ISkillSpeed speedSkill, ISkillShield skillSheild, ISkillHealth skillHealth,
+        BulletSpawnerService bulletSpawnerService, PlayerData dataPlayer, IClosestTargetLocator<EnemyView> closeTargetLocator,
+        IEnemyService enemyService)
     {
         _playerView = playerView;
         _skillSpeed = speedSkill;
@@ -37,6 +39,8 @@ public class PlayerService : IPostFixedTickable, IStartable
         _skillHealth = skillHealth;
         _bulletSpawnerService = bulletSpawnerService;
         _dataPlayer = dataPlayer;
+        _closestTargetLocator = closeTargetLocator;
+        _enemyService = enemyService;
     }
     public void Start()
     {
@@ -59,14 +63,23 @@ public class PlayerService : IPostFixedTickable, IStartable
 
     public void PostFixedTick()
     {
-        GetEnemyClosestActionSetAsync().Forget();
+        GetEnemyClosestActionSetAsync();
     }
-    private async UniTask GetEnemyClosestActionSetAsync()
+    private async void GetEnemyClosestActionSetAsync()
     {
         if (!IsDamage)
             return;
 
-        GetClosestEnemyAction?.Invoke(_playerView.transform.position);
+        var activeEnemies = _enemyService.GetActiveEnemies();
+        var closestEnemy = _closestTargetLocator.GetClosestTarget(
+             _playerView.transform.position,
+             activeEnemies,
+             enemy => enemy.transform.position,
+             5f
+         );
+        if (closestEnemy != null)
+            SetClosestEnemy(closestEnemy);
+
         IsDamage = false;
         await UniTask.Delay(1000);
         IsDamage = true;
@@ -75,7 +88,7 @@ public class PlayerService : IPostFixedTickable, IStartable
     {
         if (enemy != null)
         {
-            _bulletSpawnerService.GetBullet(enemy,_playerView,_playerView.transform.position,_dataPlayer.Attack);
+            _bulletSpawnerService.GetBullet(enemy, _playerView, _playerView.transform.position, _dataPlayer.Attack);
         }
     }
 }

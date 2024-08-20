@@ -7,7 +7,6 @@ using VContainer.Unity;
 public class ObjectPool<T> where T : Component
 {
     public readonly Queue<T> _objectsQ = new Queue<T>();
-    private List<T> _objectList = new List<T>();
     private T _prefab;
     private IObjectResolver _resolver;
     private Transform _parent;
@@ -49,20 +48,14 @@ public class ObjectPool<T> where T : Component
         var newObject = _resolver.Instantiate(_prefab, _parent);
         newObject.gameObject.SetActive(false);
         _objectsQ.Enqueue(newObject);
-        _objectList.Add(newObject);
         return newObject;
     }
     private void ShrinkPool()
     {
-
-        //while (_objectList.Count > _maxPoolSize)
-        //{
-        //    var objectToRemove = _objectList[_objectList.Count - 1];
-        //    if (objectToRemove != null)
-        //    {
-        //        _objectList.Remove(objectToRemove);
-        //        Object.Destroy(objectToRemove.gameObject);
-        //    }
-        //}
+        while (_objectsQ.Count > _maxPoolSize)
+        {
+            var obj = _objectsQ.Dequeue();
+            Object.Destroy(obj.gameObject);
+        }
     }
 }

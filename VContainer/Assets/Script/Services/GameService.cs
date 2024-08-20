@@ -37,7 +37,6 @@ public class GameService : IStartable, IDisposable
         _enemyService.CreateEnemyAsync(_playerService.GetPosition(),_levelService.GetInitialPoolSize()).Forget();
         _playerService.PlayerHealtChanged += async (heart) => await OnPlayerHealthChanged(heart);
         _playerService.PlayerDead += OnPlayerDead;
-        _playerService.GetClosestEnemyAction += (pos) => OnGetClosestEnemy(pos);
         _experienceService.ExperienceValueChanged += (experienceValue) => OnExperienceValueChangedAsync(experienceValue);
         _enemyService.EnemyDead += (enemyPos) => OnEnemyDead(enemyPos);
         _skillService.SelectSkillAction += OnSelectSkillCard;
@@ -47,11 +46,6 @@ public class GameService : IStartable, IDisposable
     private void OnSelectSkillCard()
     {
         GameEvents.OnSkillSelected?.Invoke();
-    }
-
-    private void OnGetClosestEnemy(Vector3 pos)
-    {
-        _playerService.SetClosestEnemy(_enemyService.GetClosestEnemy(pos));
     }
 
     private void OnEnemyDead(Vector3 enemyPos)
@@ -99,7 +93,6 @@ public class GameService : IStartable, IDisposable
     {
         _playerService.PlayerHealtChanged -= async (heart) => await OnPlayerHealthChanged(heart);
         _playerService.PlayerDead -= OnPlayerDead;
-        _playerService.GetClosestEnemyAction -= (pos) => OnGetClosestEnemy(pos);
         _experienceService.ExperienceValueChanged -= (experienceValue) => OnExperienceValueChangedAsync(experienceValue);
         _enemyService.EnemyDead -= (enemyPos) => OnEnemyDead(enemyPos);
         _skillService.SelectSkillAction -= OnSelectSkillCard;
