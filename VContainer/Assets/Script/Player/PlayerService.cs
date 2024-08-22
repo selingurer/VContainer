@@ -1,11 +1,12 @@
 using Assets.Script.Services;
 using Cysharp.Threading.Tasks;
 using System;
+using System.Threading;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
-public class PlayerService : IPostFixedTickable, IStartable 
+public class PlayerService : IPostFixedTickable, IStartable, IDisposable
 {
     private PlayerView _playerView;
     public ISkillSpeed _skillSpeed;
@@ -16,6 +17,7 @@ public class PlayerService : IPostFixedTickable, IStartable
     private PlayerData _playerData;
     private IBulletSpawnerService _bulletSpawnerService;
     private IEnemyService _enemyService;
+    private CancellationTokenSource _cancellationTokenSource;
     public PlayerData _dataPlayer
     {
         get => _playerData;
@@ -44,6 +46,9 @@ public class PlayerService : IPostFixedTickable, IStartable
     }
     public void Start()
     {
+        if (_cancellationTokenSource == null) 
+            _cancellationTokenSource = new CancellationTokenSource();
+
         _playerView.TakeDamage += (attackValue) => { OnTakeDamage(attackValue); };
     }
     public Vector3 GetPosition() => _playerView.transform.position;
@@ -63,6 +68,9 @@ public class PlayerService : IPostFixedTickable, IStartable
 
     public void PostFixedTick()
     {
+        if (_cancellationTokenSource == null || _cancellationTokenSource.Token.IsCancellationRequested)
+            return;
+
         GetEnemyClosestActionSetAsync();
     }
     private async void GetEnemyClosestActionSetAsync()
@@ -70,25 +78,46 @@ public class PlayerService : IPostFixedTickable, IStartable
         if (!IsDamage)
             return;
 
-        var activeEnemies = _enemyService.GetActiveEnemies();
-        var closestEnemy = _closestTargetLocator.GetClosestTarget(
-             _playerView.transform.position,
-             activeEnemies,
-             enemy => enemy.transform.position,
-             5f
-         );
-        if (closestEnemy != null)
-            SetClosestEnemy(closestEnemy);
+        try
+        {
+            if (_playerView == null)
+                return;
 
-        IsDamage = false;
-        await UniTask.Delay(1000);
-        IsDamage = true;
+            var activeEnemies = _enemyService.GetActiveEnemies();
+            var closestEnemy = _closestTargetLocator.GetClosestTarget(
+                _playerView.transform.position,
+                activeEnemies,
+                enemy => enemy.transform.position,
+                5f
+            );
+
+            if (closestEnemy != null)
+                SetClosestEnemy(closestEnemy);
+
+            IsDamage = false;
+            await UniTask.Delay(1000, cancellationToken: _cancellationTokenSource.Token);
+            IsDamage = true;
+        }
+        catch (OperationCanceledException)
+        {
+            Debug.Log("Enemy closest action was canceled.");
+        }
     }
     public void SetClosestEnemy(EnemyView enemy)
     {
         if (enemy != null)
         {
             _bulletSpawnerService.GetBullet(enemy, _playerView, _dataPlayer.Attack);
+        }
+    }
+
+    public void Dispose()
+    {
+        if (_cancellationTokenSource != null)
+        {
+            _cancellationTokenSource.Cancel();
+            _cancellationTokenSource.Dispose();
+            _cancellationTokenSource = null;
         }
     }
 }

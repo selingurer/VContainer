@@ -5,11 +5,11 @@ using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
-public class SkillService : IStartable
+public class SkillService : IStartable,IDisposable
 {
     public List<SkillData> _skillList { get; set; }
-
-    [Inject] PlayerService _playerPresenter;
+    CancellationTokenSource _cancellationToken;
+   [Inject] PlayerService _playerPresenter;
     public Action SelectSkillAction;
     public List<SkillData> GetSkillList()
     {
@@ -46,8 +46,8 @@ public class SkillService : IStartable
                SkillAction  = async () =>
                {
                    SelectedSkill();
-                   CancellationToken cancellationToken = new CancellationToken();
-                  await _playerPresenter._skillSheild.SetSkillShield(_playerPresenter._dataPlayer,_playerPresenter.GetTransform(),cancellationToken);
+                  _cancellationToken  = new CancellationTokenSource();
+                  await _playerPresenter._skillSheild.SetSkillShield(_playerPresenter._dataPlayer,_playerPresenter.GetTransform(),_cancellationToken.Token);
                },
                SkillType = SkillTypes.Shield,
                DescSkill = "Koruma Kalkanı sağlar. 10 saniye boyunca hasar almazsın.",
@@ -92,5 +92,13 @@ public class SkillService : IStartable
         AddSkill();
     }
 
-
+    public void Dispose()
+    {
+        if (_cancellationToken != null)
+        {
+            _cancellationToken.Cancel();
+            _cancellationToken.Dispose();
+            _cancellationToken = null;
+        }
+    }
 }
