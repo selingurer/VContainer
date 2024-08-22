@@ -2,6 +2,7 @@ using Cysharp.Threading.Tasks;
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using Unity.VisualScripting;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -14,6 +15,8 @@ namespace Assets.Script.Services
         private ObjectPool<EnemyView> _enemyPool;
         private CancellationTokenSource cancellationTokenSource;
         public Action<Vector3> EnemyDead;
+
+
         [Inject]
         private void Construct(ObjectPool<EnemyView> objectPoolEnemy)
         {
@@ -48,13 +51,56 @@ namespace Assets.Script.Services
             for (int i = 0; i < initialPoolSize; i++)
             {
                 var obj = _enemyPool.Get();
+                int rnd = UnityEngine.Random.Range(0, 3);
+                EnemyTypeSet(obj, (EnemyType)rnd);
                 obj.gameObject.transform.position = vectorList[i];
                 _ActiveEnemyList.Add(obj);
+                obj._isEnemyActivated = true;
                 obj.enemyDead += (enemy) =>
                 {
                     EnemyReturnToPool(enemy);
                     obj.enemyDead -= (enemy) => EnemyReturnToPool(enemy);
                 };
+            }
+        }
+        private void EnemyTypeSet(EnemyView obj, EnemyType type)
+        {
+            switch (type)
+            {
+                case EnemyType.Attack:
+                    EnemyData dataAttack = new EnemyData()
+                    {
+                        Attack = 20,
+                        Health = 100,
+                        Speed = 2f,
+                        EnemyType = type,
+                    };
+                    obj._enemyData = dataAttack;
+                    obj.GetComponent<SpriteRenderer>().color = Color.green;
+                    break;
+                case EnemyType.Heart:
+                    EnemyData dataHeart = new EnemyData()
+                    {
+                        Attack = 15,
+                        Health = 150,
+                        Speed = 2f,
+                        EnemyType = type,
+                    };
+                    obj._enemyData = dataHeart;
+                    obj.GetComponent<SpriteRenderer>().color = Color.white;
+                    break;
+                case EnemyType.Speed:
+                    EnemyData dataSpeed = new EnemyData()
+                    {
+                        Attack = 10,
+                        Health = 100,
+                        Speed = 3f,
+                        EnemyType = type,
+                    };
+                    obj._enemyData = dataSpeed;
+                    obj.StartShooting();
+                    obj.GetComponent<SpriteRenderer>().color = Color.red;
+                    break;
             }
         }
         public void EnemyReturnToPool(EnemyView enemy)
@@ -105,5 +151,6 @@ namespace Assets.Script.Services
         {
             return _ActiveEnemyList;
         }
+
     }
 }

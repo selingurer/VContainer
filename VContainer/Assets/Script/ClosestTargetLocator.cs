@@ -23,4 +23,14 @@ public class ClosestTargetLocator<T> : IClosestTargetLocator<T>
 
         return closestTarget;
     }
+
+    public T GetClosestTarget(Vector3 origin, T target, Vector3 positionSelector, float maxDistance)
+    {
+        if (target == null)
+            return default;
+
+        float distanceToTarget = Vector3.Distance(origin, positionSelector);
+
+        return distanceToTarget < maxDistance ? target : default;
+    }
 }

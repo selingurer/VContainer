@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using VContainer;
 
@@ -9,10 +10,10 @@ public class BulletSpawnerService : IBulletSpawnerService
     {
         _bulletPool.ReturnToPool(bullet);
     }
-    public void GetBullet(ITargetable target, Component owner, Vector3 pos, float attackValue)
+    public void GetBullet(ITargetable target, Component owner, float attackValue)
     {
         var obj = _bulletPool.Get();
-        obj.transform.position = pos;
+        obj.transform.position = owner.transform.position;
         obj.SetTarget(target, owner);
         obj._attackValue = attackValue;
         obj.ReturnToPoolBulletAction += OnReturnToPool;

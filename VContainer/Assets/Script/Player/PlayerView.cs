@@ -54,4 +54,10 @@ public class PlayerView : MonoBehaviour, ITargetable
     {
         return _playerData.Attack;
     }
+
+    public Vector3 GetTargetPos()
+    {
+        return transform.position;
+    }
+
 }

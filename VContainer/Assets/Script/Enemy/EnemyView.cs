@@ -1,4 +1,6 @@
+using Cysharp.Threading.Tasks;
 using System;
+using System.Threading;
 using UnityEngine;
 using VContainer;
 public enum EnemyType
@@ -8,50 +10,65 @@ public enum EnemyType
     Speed = 2,
 }
 
-public class EnemyView : MonoBehaviour, ITargetable
+public class EnemyView : MonoBehaviour, ITargetable, IDisposable
 {
     private Rigidbody2D _rigidbody;
     private PlayerView _player;
-    [Inject] private EnemyData _enemyData;
+    public EnemyData _enemyData;
     public Action<EnemyView> enemyDead;
+    private IBulletSpawnerService _bulletSpawnerService;
+    private IClosestTargetLocator<PlayerView> _closestTargetLocator;
+    private CancellationTokenSource _cancellationTokenSource;
+    public bool _isEnemyActivated = true;
 
-    private EnemyType _enemyType
-    {
-        set
-        {
-            switch (value)
-            {
-                case EnemyType.Attack:
-                    _enemyData.Attack = 20;
-                    _enemyData.Health = 100;
-                    _enemyData.Speed = 2f;
-                    gameObject.GetComponent<SpriteRenderer>().color = Color.green;
-                    break;
-                case EnemyType.Heart:
-                    _enemyData.Health = 110;
-                    _enemyData.Attack = 10;
-                    _enemyData.Speed = 2f;
-                    gameObject.GetComponent<SpriteRenderer>().color = Color.white;
-                    break;
-                case EnemyType.Speed:
-                    _enemyData.Health = 100;
-                    _enemyData.Attack = 10;
-                    _enemyData.Speed = 3f;
-                    gameObject.GetComponent<SpriteRenderer>().color = Color.red;
-                    break;
-            }
-        }
-    }
     [Inject]
-    private void Construct(PlayerView player)
+    private void Construct(PlayerView player, IBulletSpawnerService bulletService, IClosestTargetLocator<PlayerView> closeTargetLocator)
     {
         _player = player;
+        _bulletSpawnerService = bulletService;
+        _closestTargetLocator = closeTargetLocator;
     }
+    public void StartShooting()
+    {
+        _cancellationTokenSource = new CancellationTokenSource();
+        ShootAtTargetPeriodically(_cancellationTokenSource.Token).Forget();
+    }
+    private async UniTaskVoid ShootAtTargetPeriodically(CancellationToken cancellationToken)
+    {
+        try
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                await UniTask.Delay(1000, cancellationToken: cancellationToken);
+
+                if (_player != null && this != null && _bulletSpawnerService != null)
+                {
+                    ShootAtTarget();
+                }
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            Debug.Log("Shooting task was canceled.");
+        }
+    }
+
+    public void ShootAtTarget()
+    {
+        if (!_isEnemyActivated)
+            return;
+
+        var closestTarget = _closestTargetLocator.GetClosestTarget(
+                  _player.transform.position,
+                  _player, this.transform.position, 4.5f
+              );
+        if (closestTarget != null)
+            _bulletSpawnerService.GetBullet(_player, this, _enemyData.Attack);
+    }
+
     private void Awake()
     {
         _rigidbody = GetComponent<Rigidbody2D>();
-        int rnd = UnityEngine.Random.Range(0, 3);
-        _enemyType = (EnemyType)rnd;
     }
 
     private void FixedUpdate()
@@ -77,14 +94,28 @@ public class EnemyView : MonoBehaviour, ITargetable
     public void TakeDamage(float damage)
     {
         _enemyData.Health -= damage;
-        if(_enemyData.Health <= 0)
+        if (_enemyData.Health <= 0)
         {
             enemyDead?.Invoke(this);
+            _isEnemyActivated = false;
         }
     }
 
     public float GetAttackValue()
     {
-       return _enemyData.Attack;
+        return _enemyData.Attack;
+    }
+
+    public Vector3 GetTargetPos()
+    {
+        return transform.position;
+    }
+
+    public void Dispose()
+    {
+        _cancellationTokenSource.Dispose();
+        _cancellationTokenSource.Cancel();
+        _cancellationTokenSource = null;
+
     }
 }

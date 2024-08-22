@@ -64,7 +64,7 @@ public class GameUIPanel : MonoBehaviour
         _txtLevel.text = "Level" + " " + level;
         _txtLevel.gameObject.transform.DOScale(1, 0.5f).SetUpdate(true);
         await UniTask.Delay(TimeSpan.FromSeconds(1), ignoreTimeScale: true);
-        _txtLevel.gameObject.transform.DOScale(0, 0.5f).SetUpdate(true);
+        await _txtLevel.gameObject.transform.DOScale(0, 0.5f).SetUpdate(true).AsyncWaitForCompletion();
     }
     public void GameOver(GameOverData data)
     {

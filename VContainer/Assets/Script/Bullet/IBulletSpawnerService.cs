@@ -1,6 +1,7 @@
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public interface IBulletSpawnerService
 {
-    void GetBullet(ITargetable target, Component owner, Vector3 pos, float attackValue);
+    void GetBullet(ITargetable target, Component owner , float attackValue);
 }

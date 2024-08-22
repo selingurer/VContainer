@@ -5,7 +5,7 @@ using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
-public class PlayerService : IPostFixedTickable, IStartable
+public class PlayerService : IPostFixedTickable, IStartable 
 {
     private PlayerView _playerView;
     public ISkillSpeed _skillSpeed;
@@ -88,7 +88,7 @@ public class PlayerService : IPostFixedTickable, IStartable
     {
         if (enemy != null)
         {
-            _bulletSpawnerService.GetBullet(enemy, _playerView, _playerView.transform.position, _dataPlayer.Attack);
+            _bulletSpawnerService.GetBullet(enemy, _playerView, _dataPlayer.Attack);
         }
     }
 }
