@@ -127,6 +127,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _enemyData: {fileID: 0}
+  _isEnemyActivated: 1
 --- !u!58 &7722829879346471955
 CircleCollider2D:
   m_ObjectHideFlags: 0

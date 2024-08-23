@@ -1,6 +1,7 @@
 using Assets.Script.Services;
 using Cysharp.Threading.Tasks;
 using System;
+using System.ComponentModel;
 using System.Threading;
 using UnityEngine;
 using VContainer;
@@ -82,7 +83,6 @@ public class PlayerService : IPostFixedTickable, IStartable, IDisposable
         {
             if (_playerView == null)
                 return;
-
             var activeEnemies = _enemyService.GetActiveEnemies();
             var closestEnemy = _closestTargetLocator.GetClosestTarget(
                 _playerView.transform.position,

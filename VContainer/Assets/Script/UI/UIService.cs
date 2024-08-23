@@ -38,7 +38,6 @@ public class UIService : IStartable, IDisposable
 
     public void Dispose()
     {
-        // Olay aboneliklerini iptal et
         GameEvents.OnPlayerHealthChanged -= async (currentHealth, maxHealth) =>
             await _gameUIPanel.SliderHeartValueChanged((int)currentHealth, (int)maxHealth);
 
@@ -60,6 +59,6 @@ public class UIService : IStartable, IDisposable
 
     public void Start()
     {
-        Debug.Log("UIService baþladý.");
+   
     }
 }

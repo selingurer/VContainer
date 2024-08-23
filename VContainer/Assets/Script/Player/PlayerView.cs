@@ -2,12 +2,13 @@ using System;
 using UnityEngine;
 using VContainer;
 
-public class PlayerView : MonoBehaviour, ITargetable
+public class PlayerView : MonoBehaviour, ITargetable<PlayerView>
 {
     private IInputProvider _inputProvider;
     private Rigidbody2D _rigidbody;
     public Action<float> TakeDamage;
     private PlayerData _playerData;
+    private ITargetable<EnemyView> _target;
 
     [Inject]
     private void Construct(IInputProvider inputProvider, PlayerData playerData)
@@ -37,17 +38,15 @@ public class PlayerView : MonoBehaviour, ITargetable
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        var targetable = collision.GetComponent<ITargetable>();
+        var component = collision.GetComponent<Component>();
+
+        // Sonra bu bileþeni ITargetable arayüzüne dönüþtürmeye çalýþýyoruz
+        var targetable = component as ITargetable<Component>;
         if (targetable != null)
         {
             float attackValue = targetable.GetAttackValue();
             TakeDamage?.Invoke(attackValue);
         }
-    }
-
-    void ITargetable.TakeDamage(float damage)
-    {
-        TakeDamage.Invoke(damage);
     }
 
     public float GetAttackValue()
@@ -60,4 +59,18 @@ public class PlayerView : MonoBehaviour, ITargetable
         return transform.position;
     }
 
+    public Component GetTarget()
+    {
+        return this;
+    }
+
+    void ITargetable<PlayerView>.TakeDamage(float damage)
+    {
+        throw new NotImplementedException();
+    }
+
+    PlayerView ITargetable<PlayerView>.GetTarget()
+    {
+        throw new NotImplementedException();
+    }
 }

@@ -10,10 +10,10 @@ public enum EnemyType
     Speed = 2,
 }
 
-public class EnemyView : MonoBehaviour, ITargetable, IDisposable
+public class EnemyView : MonoBehaviour, ITargetable<EnemyView>, IDisposable
 {
     private Rigidbody2D _rigidbody;
-    private PlayerView _player;
+    private ITargetable<PlayerView> _target;
     public EnemyData _enemyData;
     public Action<EnemyView> enemyDead;
     private IBulletSpawnerService _bulletSpawnerService;
@@ -22,9 +22,9 @@ public class EnemyView : MonoBehaviour, ITargetable, IDisposable
     public bool _isEnemyActivated = true;
 
     [Inject]
-    private void Construct(PlayerView player, IBulletSpawnerService bulletService, IClosestTargetLocator<PlayerView> closeTargetLocator)
+    private void Construct(ITargetable<PlayerView> target,IBulletSpawnerService bulletService, IClosestTargetLocator<PlayerView> closeTargetLocator)
     {
-        _player = player;
+        _target = target;
         _bulletSpawnerService = bulletService;
         _closestTargetLocator = closeTargetLocator;
     }
@@ -41,7 +41,7 @@ public class EnemyView : MonoBehaviour, ITargetable, IDisposable
             {
                 await UniTask.Delay(1000, cancellationToken: cancellationToken);
 
-                if (_player != null && this != null && _bulletSpawnerService != null)
+                if (_target != null && this != null && _bulletSpawnerService != null)
                 {
                     ShootAtTarget();
                 }
@@ -59,11 +59,13 @@ public class EnemyView : MonoBehaviour, ITargetable, IDisposable
             return;
 
         var closestTarget = _closestTargetLocator.GetClosestTarget(
-                  _player.transform.position,
-                  _player, this.transform.position, 4.5f
+                  _target.GetTargetPos(),
+                  _target.GetTarget(), this.transform.position, 4.5f
               );
+        var targetAsComponent = _target as ITargetable<Component>;
+
         if (closestTarget != null)
-            _bulletSpawnerService.GetBullet(_player, this, _enemyData.Attack);
+            _bulletSpawnerService.GetBullet(targetAsComponent, this, _enemyData.Attack);
     }
 
     private void Awake()
@@ -77,7 +79,7 @@ public class EnemyView : MonoBehaviour, ITargetable, IDisposable
     }
     private void MoveTowardsPlayer()
     {
-        Vector2 direction = (_player.transform.position - transform.position).normalized;
+        Vector2 direction = (_target.GetTargetPos() - transform.position).normalized;
         Vector2 velocity = direction * _enemyData.Speed;
         _rigidbody.velocity = velocity;
         SetLookDirection(direction);
@@ -117,5 +119,9 @@ public class EnemyView : MonoBehaviour, ITargetable, IDisposable
         _cancellationTokenSource.Cancel();
         _cancellationTokenSource = null;
 
+    }
+    EnemyView ITargetable<EnemyView>.GetTarget()
+    {
+        return this;
     }
 }

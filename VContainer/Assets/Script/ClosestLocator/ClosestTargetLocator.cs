@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class ClosestTargetLocator<T> : IClosestTargetLocator<T>
 {
-    public T GetClosestTarget(Vector3 origin, IEnumerable<T> targets, Func<T, Vector3> positionSelector, float maxDistance = Mathf.Infinity)
+    public Component GetClosestTarget(Vector3 origin, IEnumerable<Component> targets, Func<Component, Vector3> positionSelector, float maxDistance = Mathf.Infinity)
     {
-        T closestTarget = default;
+        Component closestTarget = default;
         float closestDistance = maxDistance;
 
         foreach (var target in targets)
@@ -24,7 +24,7 @@ public class ClosestTargetLocator<T> : IClosestTargetLocator<T>
         return closestTarget;
     }
 
-    public T GetClosestTarget(Vector3 origin, T target, Vector3 positionSelector, float maxDistance)
+    public Component GetClosestTarget(Vector3 origin, Component target, Vector3 positionSelector, float maxDistance)
     {
         if (target == null)
             return default;
