@@ -3,5 +3,5 @@ using UnityEngine;
 
 public interface IBulletSpawnerService
 {
-    void GetBullet(ITargetable<Component> target, Component owner , float attackValue);
+    void GetBullet(ITargetable target, Component owner , float attackValue);
 }

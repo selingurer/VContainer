@@ -28,7 +28,7 @@ public class GameSceneLifetimeScope : LifetimeScope
         builder.RegisterInstance(gameUIPanel);
         builder.RegisterInstance(objSkillCardUI);
         builder.RegisterInstance(playerData);
-        builder.RegisterInstance(objPlayer).WithParameter(playerData);
+        builder.RegisterInstance(objPlayer).WithParameter(playerData).AsImplementedInterfaces();
         builder.Register<EnemyData>(Lifetime.Transient);
         builder.Register<EnemyView>(Lifetime.Transient).WithParameter(ScriptableObject.CreateInstance<EnemyData>());
 

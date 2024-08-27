@@ -6,12 +6,12 @@ using UnityEngine;
 public class BulletView : MonoBehaviour
 {
     public float _attackValue { get; set; }
-    private ITargetable<Component> _target;
+    private ITargetable _target;
     private Component _owner;
     public Action<BulletView> ReturnToPoolBulletAction;
-    public void SetTarget(ITargetable<Component> target,Component owner)
+    public void SetTarget(ITargetable target,Component owner)
     {
-        _target = (ITargetable<Component>)(target as Component);
+        _target = (ITargetable)(target as Component);
         _owner = owner;
         transform.DOMove((_target as Component).transform.position, 0.5f).SetEase(Ease.Linear).OnComplete(() =>
         {
@@ -24,7 +24,7 @@ public class BulletView : MonoBehaviour
         if (collision.GetComponent(_owner.GetType()) != null)
             return;
 
-        var target = collision.GetComponent<ITargetable<Component>>();
+        var target = collision.GetComponent<ITargetable>();
         if (target != null)
         {
             target.TakeDamage(_attackValue);

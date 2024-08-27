@@ -1,7 +1,6 @@
 using Assets.Script.Services;
 using Cysharp.Threading.Tasks;
 using System;
-using System.ComponentModel;
 using System.Threading;
 using UnityEngine;
 using VContainer;
@@ -92,7 +91,7 @@ public class PlayerService : IPostFixedTickable, IStartable, IDisposable
             );
 
             if (closestEnemy != null)
-                SetClosestEnemy(closestEnemy);
+                SetClosestEnemy((ITargetable)closestEnemy);
 
             IsDamage = false;
             await UniTask.Delay(1000, cancellationToken: _cancellationTokenSource.Token);
@@ -103,7 +102,7 @@ public class PlayerService : IPostFixedTickable, IStartable, IDisposable
             Debug.Log("Enemy closest action was canceled.");
         }
     }
-    public void SetClosestEnemy(EnemyView enemy)
+    public void SetClosestEnemy(ITargetable enemy)
     {
         if (enemy != null)
         {

@@ -2,7 +2,6 @@ using Cysharp.Threading.Tasks;
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using Unity.VisualScripting;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -151,6 +150,5 @@ namespace Assets.Script.Services
         {
             return _ActiveEnemyList;
         }
-
     }
 }

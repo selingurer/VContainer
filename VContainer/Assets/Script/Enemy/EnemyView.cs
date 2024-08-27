@@ -10,23 +10,23 @@ public enum EnemyType
     Speed = 2,
 }
 
-public class EnemyView : MonoBehaviour, ITargetable<EnemyView>, IDisposable
+public class EnemyView : MonoBehaviour, ITargetable, IDisposable, IEnemyData
 {
     private Rigidbody2D _rigidbody;
-    private ITargetable<PlayerView> _target;
     public EnemyData _enemyData;
     public Action<EnemyView> enemyDead;
     private IBulletSpawnerService _bulletSpawnerService;
     private IClosestTargetLocator<PlayerView> _closestTargetLocator;
     private CancellationTokenSource _cancellationTokenSource;
     public bool _isEnemyActivated = true;
+    private IPlayerData _playerData;
 
     [Inject]
-    private void Construct(ITargetable<PlayerView> target,IBulletSpawnerService bulletService, IClosestTargetLocator<PlayerView> closeTargetLocator)
+    private void Construct(IBulletSpawnerService bulletService, IClosestTargetLocator<PlayerView> closeTargetLocator,IPlayerData playerData)
     {
-        _target = target;
         _bulletSpawnerService = bulletService;
         _closestTargetLocator = closeTargetLocator;
+        _playerData = playerData;
     }
     public void StartShooting()
     {
@@ -40,11 +40,8 @@ public class EnemyView : MonoBehaviour, ITargetable<EnemyView>, IDisposable
             while (!cancellationToken.IsCancellationRequested)
             {
                 await UniTask.Delay(1000, cancellationToken: cancellationToken);
+              ShootAtTarget();
 
-                if (_target != null && this != null && _bulletSpawnerService != null)
-                {
-                    ShootAtTarget();
-                }
             }
         }
         catch (OperationCanceledException)
@@ -59,13 +56,12 @@ public class EnemyView : MonoBehaviour, ITargetable<EnemyView>, IDisposable
             return;
 
         var closestTarget = _closestTargetLocator.GetClosestTarget(
-                  _target.GetTargetPos(),
-                  _target.GetTarget(), this.transform.position, 4.5f
+                  _playerData.GetPosition(),
+                  _playerData.GetComponent(), this.transform.position, 4.5f
               );
-        var targetAsComponent = _target as ITargetable<Component>;
 
         if (closestTarget != null)
-            _bulletSpawnerService.GetBullet(targetAsComponent, this, _enemyData.Attack);
+            _bulletSpawnerService.GetBullet(_playerData.GetTargetable(), this, _enemyData.Attack);
     }
 
     private void Awake()
@@ -79,7 +75,7 @@ public class EnemyView : MonoBehaviour, ITargetable<EnemyView>, IDisposable
     }
     private void MoveTowardsPlayer()
     {
-        Vector2 direction = (_target.GetTargetPos() - transform.position).normalized;
+        Vector2 direction = (_playerData.GetPosition() - transform.position).normalized;
         Vector2 velocity = direction * _enemyData.Speed;
         _rigidbody.velocity = velocity;
         SetLookDirection(direction);
@@ -120,7 +116,13 @@ public class EnemyView : MonoBehaviour, ITargetable<EnemyView>, IDisposable
         _cancellationTokenSource = null;
 
     }
-    EnemyView ITargetable<EnemyView>.GetTarget()
+
+    public Vector3 GetPosition()
+    {
+        return transform.position;
+    }
+
+    public ITargetable GetTargetable()
     {
         return this;
     }

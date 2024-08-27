@@ -10,7 +10,7 @@ public class BulletSpawnerService : IBulletSpawnerService
     {
         _bulletPool.ReturnToPool(bullet);
     }
-    public void GetBullet(ITargetable<Component> target, Component owner, float attackValue)
+    public void GetBullet(ITargetable target, Component owner, float attackValue)
     {
         var obj = _bulletPool.Get();
         obj.transform.position = owner.transform.position;

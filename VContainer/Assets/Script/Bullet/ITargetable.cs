@@ -1,14 +1,9 @@
 
 using UnityEngine;
 
-public interface ITargetable<T> where T : class
+public interface ITargetable
 {
     void TakeDamage(float damage);
     float GetAttackValue();
-
-    Vector3 GetTargetPos();
-    T GetTarget();
-
-
 
 }

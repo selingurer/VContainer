@@ -2,13 +2,20 @@ using System;
 using UnityEngine;
 using VContainer;
 
-public class PlayerView : MonoBehaviour, ITargetable<PlayerView>
+interface IPlayerData
+{
+    public Vector3 GetPosition();
+    public Component GetComponent();
+    public ITargetable GetTargetable();
+}
+
+public class PlayerView : MonoBehaviour, ITargetable, IPlayerData
 {
     private IInputProvider _inputProvider;
     private Rigidbody2D _rigidbody;
     public Action<float> TakeDamage;
     private PlayerData _playerData;
-    private ITargetable<EnemyView> _target;
+
 
     [Inject]
     private void Construct(IInputProvider inputProvider, PlayerData playerData)
@@ -38,39 +45,37 @@ public class PlayerView : MonoBehaviour, ITargetable<PlayerView>
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        var component = collision.GetComponent<Component>();
 
-        // Sonra bu bileþeni ITargetable arayüzüne dönüþtürmeye çalýþýyoruz
-        var targetable = component as ITargetable<Component>;
-        if (targetable != null)
+        if (collision.TryGetComponent(out ITargetable target))
         {
-            float attackValue = targetable.GetAttackValue();
+            float attackValue = target.GetAttackValue();
             TakeDamage?.Invoke(attackValue);
         }
+
     }
 
     public float GetAttackValue()
     {
         return _playerData.Attack;
     }
+    void ITargetable.TakeDamage(float damage)
+    {
 
-    public Vector3 GetTargetPos()
+    }
+
+    public Vector3 GetPosition()
     {
         return transform.position;
     }
 
-    public Component GetTarget()
+    public Component GetComponent()
     {
         return this;
+
     }
 
-    void ITargetable<PlayerView>.TakeDamage(float damage)
+    public ITargetable GetTargetable()
     {
-        throw new NotImplementedException();
-    }
-
-    PlayerView ITargetable<PlayerView>.GetTarget()
-    {
-        throw new NotImplementedException();
+        return this;
     }
 }
