@@ -48,12 +48,12 @@ public class GameUIPanel : MonoBehaviour
     {
         _sceneService.LoadScene(SceneType.MainScene);
     }
-    public async UniTask SliderHeartValueChanged(int heartValue, int maxValue)
+    public  void SliderHeartValueChanged(int heartValue, int maxValue)
     {
         _sliderHeart.maxValue = maxValue;
         _sliderHeart.DOValue(heartValue, 0.5f).SetEase(Ease.Linear).SetUpdate(true);
     }
-    public async UniTask ExperienceValueChanged(int exValue, int maxValue)
+    public void ExperienceValueChanged(int exValue, int maxValue)
     {
         _sliderExperience.maxValue = maxValue;
         _sliderExperience.DOValue(exValue, 0.5f).SetEase(Ease.Linear);

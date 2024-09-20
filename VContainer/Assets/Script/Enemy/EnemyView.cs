@@ -9,8 +9,12 @@ public enum EnemyType
     Heart = 1,
     Speed = 2,
 }
-
-public class EnemyView : MonoBehaviour, ITargetable, IDisposable, IEnemyData
+public interface IEnemyData
+{
+    public Vector3 GetPosition();
+    public ITargetable GetTargetable();
+}
+public class EnemyView : MonoBehaviour, ITargetable,IEnemyData
 {
     private Rigidbody2D _rigidbody;
     public EnemyData _enemyData;
@@ -104,26 +108,19 @@ public class EnemyView : MonoBehaviour, ITargetable, IDisposable, IEnemyData
         return _enemyData.Attack;
     }
 
-    public Vector3 GetTargetPos()
+    private void OnDisable()
     {
-        return transform.position;
-    }
-
-    public void Dispose()
-    {
-        _cancellationTokenSource.Dispose();
         _cancellationTokenSource.Cancel();
-        _cancellationTokenSource = null;
-
     }
 
     public Vector3 GetPosition()
     {
-        return transform.position;
+        throw new NotImplementedException();
     }
 
     public ITargetable GetTargetable()
     {
         return this;
     }
+
 }

@@ -10,7 +10,7 @@ namespace Assets.Script.Services
 {
     public class EnemyService : IDisposable, IStartable, IEnemyService
     {
-        public List<EnemyView> _ActiveEnemyList = new List<EnemyView>();
+        public List<EnemyView> _ActiveEnemyList = new();
         private ObjectPool<EnemyView> _enemyPool;
         private CancellationTokenSource cancellationTokenSource;
         public Action<Vector3> EnemyDead;
@@ -20,6 +20,19 @@ namespace Assets.Script.Services
         private void Construct(ObjectPool<EnemyView> objectPoolEnemy)
         {
             _enemyPool = objectPoolEnemy;
+        }
+        public void Start()
+        {
+            cancellationTokenSource = new CancellationTokenSource();
+        }
+        public void Dispose()
+        {
+            if (cancellationTokenSource != null)
+            {
+                cancellationTokenSource.Cancel();
+                cancellationTokenSource.Dispose();
+                cancellationTokenSource = null;
+            }
         }
         public async UniTask CreateEnemyAsync(Vector3 playerPos, int initialPoolSize)
         {
@@ -108,44 +121,7 @@ namespace Assets.Script.Services
             _enemyPool.ReturnToPool(enemy);
             _ActiveEnemyList.Remove(enemy);
         }
-
-        public void Dispose()
-        {
-            if (cancellationTokenSource != null)
-            {
-                cancellationTokenSource.Cancel();
-                cancellationTokenSource.Dispose();
-                cancellationTokenSource = null;
-            }
-        }
-
-        public void Start()
-        {
-            cancellationTokenSource = new CancellationTokenSource();
-        }
-
-        public EnemyView GetClosestTarget(Vector3 origin, float range)
-        {
-            EnemyView closestEnemy = null;
-            float closestDistance = Mathf.Infinity;
-
-            foreach (EnemyView enemy in _ActiveEnemyList)
-            {
-                float distanceToEnemy = Vector3.Distance(enemy.transform.position, origin);
-
-                if (distanceToEnemy <= range)
-                {
-                    if (distanceToEnemy < closestDistance)
-                    {
-                        closestDistance = distanceToEnemy;
-                        closestEnemy = enemy;
-                    }
-                }
-            }
-
-            return closestEnemy;
-        }
-
+        
         public IEnumerable<EnemyView> GetActiveEnemies()
         {
             return _ActiveEnemyList;

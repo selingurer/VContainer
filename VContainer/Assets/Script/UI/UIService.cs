@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -11,54 +13,41 @@ public class UIService : IStartable, IDisposable
     private void Construct(GameUIPanel gameUIPanel)
     {
         _gameUIPanel = gameUIPanel;
-        SubscribeToEvents();
     }
-
-    private void SubscribeToEvents()
-    {
-        GameEvents.OnPlayerHealthChanged += async (currentHealth, maxHealth) =>
-            await _gameUIPanel.SliderHeartValueChanged((int)currentHealth, (int)maxHealth);
-
-        GameEvents.OnExperienceChanged += async (currentExp, expTarget) =>
-            await _gameUIPanel.ExperienceValueChanged(currentExp, expTarget);
-
-        GameEvents.OnLevelUp += async (level, skillDatalist) =>
-        {
-            await _gameUIPanel.LevelChanged(level);
-            _gameUIPanel.CreateSkillCard(skillDatalist);
-        };
-
-
-        GameEvents.OnGameOver += (data) =>
-            _gameUIPanel.GameOver(data);
-
-        GameEvents.OnSkillSelected += () =>
-            _gameUIPanel.ClearSkillCard();
-    }
-
-    public void Dispose()
-    {
-        GameEvents.OnPlayerHealthChanged -= async (currentHealth, maxHealth) =>
-            await _gameUIPanel.SliderHeartValueChanged((int)currentHealth, (int)maxHealth);
-
-        GameEvents.OnExperienceChanged -= async (currentExp, expTarget) =>
-            await _gameUIPanel.ExperienceValueChanged(currentExp, expTarget);
-
-        GameEvents.OnLevelUp -= async (level, skillDatalist) =>
-        {
-            await _gameUIPanel.LevelChanged(level);
-            _gameUIPanel.CreateSkillCard(skillDatalist);
-        };
-
-        GameEvents.OnGameOver -= (data) =>
-            _gameUIPanel.GameOver(data);
-
-        GameEvents.OnSkillSelected -= () =>
-            _gameUIPanel.ClearSkillCard();
-    }
-
     public void Start()
     {
-   
+        SubscribeToEvents();
     }
+    public void Dispose()
+    {
+        GameEvents.OnPlayerHealthChanged -= OnPlayerHeathChanged;
+        GameEvents.OnExperienceChanged -= OnExperienceChanged;
+        GameEvents.OnLevelUp -= OnLevelUp;
+        GameEvents.OnGameOver -= _gameUIPanel.GameOver;
+        GameEvents.OnSkillSelected -= _gameUIPanel.ClearSkillCard;
+    }
+    private void SubscribeToEvents()
+    {
+        GameEvents.OnPlayerHealthChanged += OnPlayerHeathChanged;
+        GameEvents.OnExperienceChanged += OnExperienceChanged;
+        GameEvents.OnLevelUp += OnLevelUp;
+        GameEvents.OnGameOver += _gameUIPanel.GameOver;
+        GameEvents.OnSkillSelected += _gameUIPanel.ClearSkillCard;
+    }
+
+    private void OnExperienceChanged(int currentExperience, int maxExperience)
+    {
+        _gameUIPanel.ExperienceValueChanged(currentExperience, maxExperience);
+    }
+
+    private void OnPlayerHeathChanged(float currentHealth, float maxHealth)
+    {
+        _gameUIPanel.SliderHeartValueChanged((int)currentHealth, (int)maxHealth);
+    }
+    private void OnLevelUp(int level, List<SkillData> skillDatalist)
+    {
+        _gameUIPanel.LevelChanged(level).Forget();
+        _gameUIPanel.CreateSkillCard(skillDatalist);
+    }
+  
 }

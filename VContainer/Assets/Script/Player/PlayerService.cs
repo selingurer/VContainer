@@ -49,7 +49,7 @@ public class PlayerService : IPostFixedTickable, IStartable, IDisposable
         if (_cancellationTokenSource == null) 
             _cancellationTokenSource = new CancellationTokenSource();
 
-        _playerView.TakeDamage += (attackValue) => { OnTakeDamage(attackValue); };
+        _playerView.TakeDamage +=  OnTakeDamage;
     }
     public Vector3 GetPosition() => _playerView.transform.position;
 

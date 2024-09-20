@@ -7,9 +7,13 @@ using VContainer;
 using VContainer.Unity;
 public static class GameEvents
 {
-    public static Action<float, float> OnPlayerHealthChanged;
-    public static Action<int, int> OnExperienceChanged;
-    public static Action<int,List<SkillData>> OnLevelUp;
+    public  delegate void OnPlayerHeathChangedDelegate(float currentHealth, float maxHealth);
+    public delegate void OnExperienceChangedDelegate(int currentExperience, int maxExperience);
+    public delegate void OnLevelUpDelegate(int currentLevel, List<SkillData> skillDatas);
+    
+    public static OnPlayerHeathChangedDelegate OnPlayerHealthChanged;
+    public static OnExperienceChangedDelegate OnExperienceChanged;
+    public static OnLevelUpDelegate OnLevelUp;
     public static Action<GameOverData> OnGameOver;
     public static Action OnSkillSelected;
 }
@@ -77,8 +81,6 @@ public class GameService : IStartable, IDisposable
         };
         GameEvents.OnGameOver?.Invoke(data);
         ResetToData();
-
-
     }
     private void ResetToData()
     {

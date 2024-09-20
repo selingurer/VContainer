@@ -45,15 +45,12 @@ public class PlayerView : MonoBehaviour, ITargetable, IPlayerData
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-
         if (collision.TryGetComponent(out ITargetable target))
         {
             float attackValue = target.GetAttackValue();
             TakeDamage?.Invoke(attackValue);
         }
-
     }
-
     public float GetAttackValue()
     {
         return _playerData.Attack;
@@ -62,18 +59,14 @@ public class PlayerView : MonoBehaviour, ITargetable, IPlayerData
     {
 
     }
-
     public Vector3 GetPosition()
     {
         return transform.position;
     }
-
     public Component GetComponent()
     {
         return this;
-
     }
-
     public ITargetable GetTargetable()
     {
         return this;
