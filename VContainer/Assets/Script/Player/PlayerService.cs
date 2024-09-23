@@ -1,4 +1,3 @@
-using Assets.Script.Services;
 using Cysharp.Threading.Tasks;
 using System;
 using System.Threading;
@@ -8,15 +7,15 @@ using VContainer.Unity;
 
 public class PlayerService : IPostFixedTickable, IStartable, IDisposable
 {
-    private PlayerView _playerView;
     public ISkillSpeed _skillSpeed;
     public ISkillShield _skillSheild;
     public ISkillHealth _skillHealth;
-    private IClosestTargetLocator<EnemyView> _closestTargetLocator;
+    private PlayerView _playerView;
+    private ClosestTargetLocator<EnemyView> _closestTargetLocator;
     private bool IsDamage = true;
     private PlayerData _playerData;
     private IBulletSpawnerService _bulletSpawnerService;
-    private IEnemyService _enemyService;
+    private IGetActiveComponentList _enemyService;
     private CancellationTokenSource _cancellationTokenSource;
     public PlayerData _dataPlayer
     {
@@ -32,8 +31,8 @@ public class PlayerService : IPostFixedTickable, IStartable, IDisposable
 
     [Inject]
     private void Construct(PlayerView playerView, ISkillSpeed speedSkill, ISkillShield skillSheild, ISkillHealth skillHealth,
-        IBulletSpawnerService bulletSpawnerService, PlayerData dataPlayer, IClosestTargetLocator<EnemyView> closeTargetLocator,
-        IEnemyService enemyService)
+        IBulletSpawnerService bulletSpawnerService, PlayerData dataPlayer, ClosestTargetLocator<EnemyView> closeTargetLocator,
+        IGetActiveComponentList enemyService)
     {
         _playerView = playerView;
         _skillSpeed = speedSkill;
@@ -82,7 +81,7 @@ public class PlayerService : IPostFixedTickable, IStartable, IDisposable
         {
             if (_playerView == null)
                 return;
-            var activeEnemies = _enemyService.GetActiveEnemies();
+            var activeEnemies = _enemyService.GetActiveList();
             var closestEnemy = _closestTargetLocator.GetClosestTarget(
                 _playerView.transform.position,
                 activeEnemies,

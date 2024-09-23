@@ -8,9 +8,9 @@ using VContainer.Unity;
 
 public class ExperienceService : IStartable, IDisposable
 {
-    private int exValue;
-    [Inject] private ObjectPool<ExperienceView> _experiencePool;
     public Action<int> ExperienceValueChanged;
+    [Inject] private ObjectPool<ExperienceView> _experiencePool;
+    private int exValue;
     private CancellationTokenSource _cancellationTokenSource;
     public void GetExperience(Vector3 pos)
     {
@@ -19,6 +19,20 @@ public class ExperienceService : IStartable, IDisposable
         obj.ExperienceClaim += OnExperienceClaim;
         obj.ReturnToPoolExperienceAction += OnReturnToExperiencePool;
         _ = ReturnToPoolAsync(obj);
+    }
+    public void Start()
+    {
+        _cancellationTokenSource = new CancellationTokenSource();
+    }
+
+    public void Dispose()
+    {
+        if (_cancellationTokenSource != null)
+        {
+            _cancellationTokenSource.Cancel();
+            _cancellationTokenSource.Dispose();
+        }
+        _cancellationTokenSource = new CancellationTokenSource();
     }
     private void OnExperienceClaim(int value)
     {
@@ -36,19 +50,5 @@ public class ExperienceService : IStartable, IDisposable
     {
         await UniTask.Delay(TimeSpan.FromSeconds(10));
         if (experience != null) OnReturnToExperiencePool(experience);
-    }
-    public void Start()
-    {
-        _cancellationTokenSource = new CancellationTokenSource();
-    }
-
-    public void Dispose()
-    {
-        if (_cancellationTokenSource != null)
-        {
-            _cancellationTokenSource.Cancel();
-            _cancellationTokenSource.Dispose();
-        }
-        _cancellationTokenSource = new CancellationTokenSource();
     }
 }

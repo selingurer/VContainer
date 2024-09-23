@@ -11,25 +11,19 @@ public enum EnemyType
     Speed = 2,
 }
 
-public interface IEnemyData
+public class EnemyView : MonoBehaviour, ITargetable
 {
-    public Vector3 GetPosition();
-    public ITargetable GetTargetable();
-}
-
-public class EnemyView : MonoBehaviour, ITargetable, IEnemyData
-{
-    private Rigidbody2D _rigidbody;
+    public bool _isEnemyActivated = true;
     public EnemyData _enemyData;
     public Action<EnemyView> enemyDead;
+    private Rigidbody2D _rigidbody;
     private IBulletSpawnerService _bulletSpawnerService;
-    private IClosestTargetLocator<PlayerView> _closestTargetLocator;
+    private ClosestTargetLocator<PlayerView> _closestTargetLocator;
     private CancellationTokenSource _cancellationTokenSource = new();
-    public bool _isEnemyActivated = true;
     private IPlayerData _playerData;
 
     [Inject]
-    private void Construct(IBulletSpawnerService bulletService, IClosestTargetLocator<PlayerView> closeTargetLocator,
+    private void Construct(IBulletSpawnerService bulletService, ClosestTargetLocator<PlayerView> closeTargetLocator,
         IPlayerData playerData)
     {
         _bulletSpawnerService = bulletService;
@@ -40,10 +34,36 @@ public class EnemyView : MonoBehaviour, ITargetable, IEnemyData
     public void StartShooting()
     {
         //_cancellationTokenSource = new CancellationTokenSource();
-        ShootAtTargetPeriodically(_cancellationTokenSource.Token).Forget();
+        ShootAtTargetPeriodicallyAsync(_cancellationTokenSource.Token).Forget();
+    }
+    public void ShootAtTarget()
+    {
+        if (!_isEnemyActivated)
+            return;
+
+        var closestTarget = _closestTargetLocator.GetClosestTarget(
+            _playerData.GetPosition(),
+            _playerData.GetComponent(), this.transform.position, 4.5f
+        );
+
+        if (closestTarget != null)
+            _bulletSpawnerService.GetBullet(_playerData.GetTargetable(), this, _enemyData.Attack);
+    }
+    public void TakeDamage(float damage)
+    {
+        _enemyData.Health -= damage;
+        if (_enemyData.Health <= 0)
+        {
+            enemyDead?.Invoke(this);
+            _isEnemyActivated = false;
+        }
     }
 
-    private async UniTaskVoid ShootAtTargetPeriodically(CancellationToken cancellationToken)
+    public float GetAttackValue()
+    {
+        return _enemyData.Attack;
+    }
+    private async UniTaskVoid ShootAtTargetPeriodicallyAsync(CancellationToken cancellationToken)
     {
         try
         {
@@ -59,19 +79,7 @@ public class EnemyView : MonoBehaviour, ITargetable, IEnemyData
         }
     }
 
-    public void ShootAtTarget()
-    {
-        if (!_isEnemyActivated)
-            return;
-
-        var closestTarget = _closestTargetLocator.GetClosestTarget(
-            _playerData.GetPosition(),
-            _playerData.GetComponent(), this.transform.position, 4.5f
-        );
-
-        if (closestTarget != null)
-            _bulletSpawnerService.GetBullet(_playerData.GetTargetable(), this, _enemyData.Attack);
-    }
+  
 
     private void Awake()
     {
@@ -99,34 +107,10 @@ public class EnemyView : MonoBehaviour, ITargetable, IEnemyData
             _rigidbody.rotation = angle;
         }
     }
-
-    public void TakeDamage(float damage)
-    {
-        _enemyData.Health -= damage;
-        if (_enemyData.Health <= 0)
-        {
-            enemyDead?.Invoke(this);
-            _isEnemyActivated = false;
-        }
-    }
-
-    public float GetAttackValue()
-    {
-        return _enemyData.Attack;
-    }
-
+    
     private void OnDisable()
     {
         _cancellationTokenSource.Cancel();
     }
 
-    public Vector3 GetPosition()
-    {
-        throw new NotImplementedException();
-    }
-
-    public ITargetable GetTargetable()
-    {
-        return this;
-    }
 }

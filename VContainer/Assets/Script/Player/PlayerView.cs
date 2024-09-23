@@ -11,9 +11,9 @@ interface IPlayerData
 
 public class PlayerView : MonoBehaviour, ITargetable, IPlayerData
 {
+    public Action<float> TakeDamage;
     private IInputProvider _inputProvider;
     private Rigidbody2D _rigidbody;
-    public Action<float> TakeDamage;
     private PlayerData _playerData;
 
 

@@ -8,12 +8,12 @@ using VContainer.Unity;
 
 namespace Assets.Script.Services
 {
-    public class EnemyService : IDisposable, IStartable, IEnemyService
+    public class EnemyService : IDisposable, IStartable, IGetActiveComponentList
     {
         public List<EnemyView> _ActiveEnemyList = new();
+        public Action<Vector3> EnemyDead;
         private ObjectPool<EnemyView> _enemyPool;
         private CancellationTokenSource cancellationTokenSource;
-        public Action<Vector3> EnemyDead;
 
 
         [Inject]
@@ -49,6 +49,13 @@ namespace Assets.Script.Services
                 Debug.Log("Enemy creation task was canceled.");
             }
         }
+        public void EnemyReturnToPool(EnemyView enemy)
+        {
+            EnemyDead?.Invoke(enemy.transform.position);
+            _enemyPool.ReturnToPool(enemy);
+            _ActiveEnemyList.Remove(enemy);
+        }
+
         private void CreateEnemy(Vector3 playerPos, int initialPoolSize)
         {
             List<Vector2> vectorList = new List<Vector2>();
@@ -115,14 +122,8 @@ namespace Assets.Script.Services
                     break;
             }
         }
-        public void EnemyReturnToPool(EnemyView enemy)
-        {
-            EnemyDead?.Invoke(enemy.transform.position);
-            _enemyPool.ReturnToPool(enemy);
-            _ActiveEnemyList.Remove(enemy);
-        }
-        
-        public IEnumerable<EnemyView> GetActiveEnemies()
+   
+        public IEnumerable<Component> GetActiveList()
         {
             return _ActiveEnemyList;
         }
