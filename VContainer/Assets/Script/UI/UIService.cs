@@ -14,10 +14,12 @@ public class UIService : IStartable, IDisposable
     {
         _gameUIPanel = gameUIPanel;
     }
+
     public void Start()
     {
         SubscribeToEvents();
     }
+
     public void Dispose()
     {
         GameEvents.OnPlayerHealthChanged -= OnPlayerHeathChanged;
@@ -26,6 +28,7 @@ public class UIService : IStartable, IDisposable
         GameEvents.OnGameOver -= _gameUIPanel.GameOver;
         GameEvents.OnSkillSelected -= _gameUIPanel.ClearSkillCard;
     }
+
     private void SubscribeToEvents()
     {
         GameEvents.OnPlayerHealthChanged += OnPlayerHeathChanged;
@@ -44,10 +47,10 @@ public class UIService : IStartable, IDisposable
     {
         _gameUIPanel.SliderHeartValueChanged((int)currentHealth, (int)maxHealth);
     }
-    private void OnLevelUp(int level, List<SkillData> skillDatalist)
+
+    private async void OnLevelUp(int level, List<SkillData> skillDatalist)
     {
-        _gameUIPanel.LevelChanged(level).Forget();
+        await _gameUIPanel.LevelChanged(level);
         _gameUIPanel.CreateSkillCard(skillDatalist);
     }
-  
 }
