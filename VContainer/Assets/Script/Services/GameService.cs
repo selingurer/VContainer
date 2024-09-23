@@ -37,6 +37,7 @@ public class GameService : IStartable, IDisposable
 
     void IStartable.Start()
     {
+        ResetToData();
         _levelService.SetLevel(1);
         _enemyService.CreateEnemyAsync(_playerService.GetPosition(),_levelService.GetInitialPoolSize()).Forget();
         _playerService.PlayerHealtChanged += async (heart) => await OnPlayerHealthChanged(heart);

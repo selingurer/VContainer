@@ -9,7 +9,7 @@ public class SkillService : IStartable,IDisposable
 {
     public List<SkillData> _skillList { get; set; }
     CancellationTokenSource _cancellationToken;
-   [Inject] PlayerService _playerPresenter;
+   [Inject] PlayerService _playerService;
     public Action SelectSkillAction;
     public List<SkillData> GetSkillList()
     {
@@ -47,7 +47,7 @@ public class SkillService : IStartable,IDisposable
                {
                    SelectedSkill();
                   _cancellationToken  = new CancellationTokenSource();
-                  await _playerPresenter._skillSheild.SetSkillShield(_playerPresenter._dataPlayer,_playerPresenter.GetTransform(),_cancellationToken.Token);
+                  await _playerService._skillSheild.SetSkillShield(_playerService._dataPlayer,_playerService.GetTransform(),_cancellationToken.Token);
                },
                SkillType = SkillTypes.Shield,
                DescSkill = "Koruma Kalkanı sağlar. 10 saniye boyunca hasar almazsın.",
@@ -58,7 +58,7 @@ public class SkillService : IStartable,IDisposable
                  SkillAction = () =>
                  {
                   SelectedSkill();
-                  _playerPresenter._skillHealth.SetSkillHealth(_playerPresenter._dataPlayer);
+                  _playerService._skillHealth.SetSkillHealth(_playerService._dataPlayer);
                  },
                SkillType = SkillTypes.Heart,
                DescSkill = "Can hasarını %100 iyileştirir.",
@@ -70,7 +70,7 @@ public class SkillService : IStartable,IDisposable
                SkillAction = () =>
                  {
                    SelectedSkill();
-                   _playerPresenter._skillSpeed.SetSkillSpeed(_playerPresenter._dataPlayer);
+                   _playerService._skillSpeed.SetSkillSpeed(_playerService._dataPlayer);
                  },
                SkillType = SkillTypes.Speed,
                DescSkill = "Hızını %30 arttırır.",
