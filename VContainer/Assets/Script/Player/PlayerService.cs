@@ -5,11 +5,8 @@ using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
-public class PlayerService : IPostFixedTickable, IStartable, IDisposable
+public class PlayerService : IPostFixedTickable, IStartable, IDisposable,ISkillShield,ISkillHealth,ISkillSpeed
 {
-    public ISkillSpeed _skillSpeed;
-    public ISkillShield _skillSheild;
-    public ISkillHealth _skillHealth;
     private PlayerView _playerView;
     private ClosestTargetLocator<EnemyView> _closestTargetLocator;
     private bool IsDamage = true;
@@ -17,6 +14,8 @@ public class PlayerService : IPostFixedTickable, IStartable, IDisposable
     private IBulletSpawnerService _bulletSpawnerService;
     private IGetActiveComponentList _enemyService;
     private CancellationTokenSource _cancellationTokenSource;
+    private IObjectResolver _objectResolver;
+    private GameObject _skillSheildObject; 
     public PlayerData _dataPlayer
     {
         get => _playerData;
@@ -30,18 +29,17 @@ public class PlayerService : IPostFixedTickable, IStartable, IDisposable
     public Action<float> PlayerHealtChanged;
 
     [Inject]
-    private void Construct(PlayerView playerView, ISkillSpeed speedSkill, ISkillShield skillSheild, ISkillHealth skillHealth,
+    private void Construct(PlayerView playerView, ISkillSpeed speedSkill,
         IBulletSpawnerService bulletSpawnerService, PlayerData dataPlayer, ClosestTargetLocator<EnemyView> closeTargetLocator,
-        IGetActiveComponentList enemyService)
+        IGetActiveComponentList enemyService, IObjectResolver objectResolver, GameObject skillSheildObject)
     {
         _playerView = playerView;
-        _skillSpeed = speedSkill;
-        _skillSheild = skillSheild;
-        _skillHealth = skillHealth;
         _bulletSpawnerService = bulletSpawnerService;
         _dataPlayer = dataPlayer;
         _closestTargetLocator = closeTargetLocator;
         _enemyService = enemyService;
+        _objectResolver = objectResolver;
+        _skillSheildObject = skillSheildObject;
     }
     public void Start()
     {
@@ -117,5 +115,43 @@ public class PlayerService : IPostFixedTickable, IStartable, IDisposable
             _cancellationTokenSource.Dispose();
             _cancellationTokenSource = null;
         }
+    }
+
+    public async UniTask SetSkillShield()
+    {
+        try
+        {
+            _dataPlayer.Shield = true;
+            var objectSkill = _objectResolver.Instantiate(_skillSheildObject);
+            objectSkill.transform.SetParent(_playerView.transform, false);
+            
+            await UniTask.Delay(10000, cancellationToken: _cancellationTokenSource.Token);
+            
+            if (!_cancellationTokenSource.Token.IsCancellationRequested)
+            {
+                objectSkill.gameObject.SetActive(false);
+                _dataPlayer.Shield = false;
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            Debug.Log("Skill shield task was cancelled.");
+        }
+        catch (MissingReferenceException ex)
+        {
+            Debug.LogError("Missing reference: " + ex.Message);
+        }
+    }
+
+    public void SetSkillHealth()
+    {
+        _dataPlayer.Health = _dataPlayer.FirstHealth;
+    }
+
+    public float SpeedBost { get => 1.5f; }
+
+    public void SetSkillSpeed()
+    {
+        _dataPlayer.Speed *= SpeedBost; 
     }
 }

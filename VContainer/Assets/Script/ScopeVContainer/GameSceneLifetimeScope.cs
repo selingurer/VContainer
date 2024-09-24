@@ -31,14 +31,10 @@ public class GameSceneLifetimeScope : LifetimeScope
         builder.RegisterInstance(objPlayer).WithParameter(playerData).AsImplementedInterfaces();
         builder.Register<EnemyData>(Lifetime.Transient);
         builder.Register<EnemyView>(Lifetime.Transient).WithParameter(ScriptableObject.CreateInstance<EnemyData>());
-
-        //Skill
-        builder.Register<SkillHealth>(Lifetime.Transient).AsImplementedInterfaces();
-        builder.Register<SkillSpeed>(Lifetime.Transient).AsImplementedInterfaces();
-        builder.Register<SkillShield>(Lifetime.Transient).AsImplementedInterfaces().WithParameter(objSheildSkill);
+        
 
         //Player
-        builder.Register<PlayerService>(Lifetime.Singleton).AsSelf().AsImplementedInterfaces().WithParameter(playerData);
+        builder.Register<PlayerService>(Lifetime.Singleton).AsSelf().AsImplementedInterfaces().WithParameter(playerData).WithParameter(objSheildSkill);
 
         builder.Register<ClosestTargetLocator<EnemyView>>(Lifetime.Singleton).AsSelf().AsImplementedInterfaces();
         builder.Register<ClosestTargetLocator<PlayerView>>(Lifetime.Singleton).AsSelf().AsImplementedInterfaces();
